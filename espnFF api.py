@@ -10,13 +10,32 @@ try:
 except AuthorizationError:
     print('failed to authorize')
 
-league = client.get_league(fantasy_league['league_id'], 2017)
+league = client.get_league(fantasy_league['league_id'], 2018)
 
 
 
 
-matchup = league.scoreboard(week=1)
+matchup = league.players()
 
 
 
 print(matchup)
+
+''' end points
+leagueSettings
+playerInfo
+scoreboard
+player/news
+recentActivity
+leagueSchedules
+teams
+rosterInfo
+schedule
+polls
+messageboard
+boxscore
+status
+teams/pendingMoveBatches
+tweets
+stories
+livescoring'''

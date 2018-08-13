@@ -15,7 +15,7 @@ league = client.get_league(fantasy_league['league_id'], 2018)
 
 
 
-matchup = league.players()
+matchup = league.boxscore()
 
 
 

@@ -2,19 +2,15 @@ import requests
 from bs4 import BeautifulSoup as bs
 import pandas as pd
 from tabulate import tabulate
-import sqlite3
 
 import sys
 sys.path.insert(0,'..')
 
-from security import sqlite_location
-
-conn = sqlite3.connect(sqlite_location+"/ff_data.db")
-
-c = conn.cursor()
+from DOConn import connection
+from DOsshTunnel import DOConnect
 
 
-url = 'http://www.footballoutsiders.com/stats/'
+
 
 
 stat_dicts = []
@@ -346,54 +342,58 @@ stat_dicts.append({'table_name' : 'fo_dl',
                    })
 
 
-for sql_table in stat_dicts:
+with DOConnect() as tunnel:
+    c, conn = connection(tunnel)
+    url = 'http://www.footballoutsiders.com/stats/'
 
-    if sql_table['drop_table'] == True:
-        c.execute('drop table if exists %s' % sql_table['table_name'])
-        conn.commit()
+    for sql_table in stat_dicts:
 
-    if sql_table['create_table'] == True:
-        create_statement = "create table %s (" % sql_table['table_name']
-        create_statement += sql_table['columns'][0]['column_name']
-        create_statement += ' '
-        create_statement += sql_table['columns'][0]['data_type']
-        for column in sql_table['columns'][1:]:
-            create_statement += ', '
-            create_statement += column['column_name']
+        if sql_table['drop_table'] == True:
+            c.execute('drop table if exists scrapped_data.%s' % sql_table['table_name'])
+            conn.commit()
+
+        if sql_table['create_table'] == True:
+            create_statement = "create table scrapped_data.%s (" % sql_table['table_name']
+            create_statement += sql_table['columns'][0]['column_name']
             create_statement += ' '
-            create_statement += column['data_type']
-        create_statement += ')'
-        c.execute(create_statement)
-        conn.commit()
+            create_statement += sql_table['columns'][0]['data_type']
+            for column in sql_table['columns'][1:]:
+                create_statement += ', '
+                create_statement += column['column_name']
+                create_statement += ' '
+                create_statement += column['data_type']
+            create_statement += ', dataCreate datetime)'
+            c.execute(create_statement)
+            conn.commit()
 
-    url2 = url + sql_table['address']
+        url2 = url + sql_table['address']
 
-    req = requests.get(url2)
+        req = requests.get(url2)
 
-    xml = bs(req.text,'lxml')
-
-
-    table = xml.find_all('table')[sql_table['table_index']]
-    for row in table.find_all('tr'):
-        if len(row.find_all('td')) > 0:
-            if row.find_all('td')[0].get_text() not in ('','Rk','x','Player'):
-                row_data = []
-                row_data.append(2017)
-                row_data.append(17)
-                for cell in row.find_all('td'):
-                    row_data.append(cell.get_text())
-                sql_statement = "INSERT INTO " + sql_table['table_name'] + " values( "
-                for row in row_data:
-                    sql_statement += "'" + str(row) +  "', "
-                sql_statement = sql_statement[:-2]
-                sql_statement += ")"
-                c.execute(sql_statement)
-                conn.commit()
-
-         
+        xml = bs(req.text,'lxml')
 
 
-        
+        table = xml.find_all('table')[sql_table['table_index']]
+        for row in table.find_all('tr'):
+            if len(row.find_all('td')) > 0:
+                if row.find_all('td')[0].get_text() not in ('','Rk','x','Player'):
+                    row_data = []
+                    row_data.append(2017)
+                    row_data.append(17)
+                    for cell in row.find_all('td'):
+                        row_data.append(cell.get_text())
+                    sql_statement = "INSERT INTO scrapped_data." + sql_table['table_name'] + " values( "
+                    for row in row_data:
+                        sql_statement += "'" + str(row) +  "', "
+                    sql_statement = sql_statement[:-2]
+                    sql_statement += ", current_timestamp())"
+                    c.execute(sql_statement)
+                    conn.commit()
+
+             
+
+
+            
 
 conn.close()
 

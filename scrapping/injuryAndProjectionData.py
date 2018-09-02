@@ -3,6 +3,9 @@ pull before draft
 pull data every week - Thursday afternoon, Saturday night, sunday morning, sunday afternoon, sunday night, monday afternoon,
 tuesday morning
 '''
+'''
+use http://www.fftoday.com for injury data
+'''
 
 import requests
 import pandas as pd

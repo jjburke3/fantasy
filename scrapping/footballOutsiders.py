@@ -118,7 +118,7 @@ stat_dicts.append({'table_name' : 'fo_team_st',
                        {'column_name' : 'weight_dvoa', 'data_type' : 'float'},
                        {'column_name' : 'weight_rank', 'data_type' : 'integer'},
                        {'column_name' : 'fg_xp', 'data_type' : 'float'},
-                       {'column_name' : 'kick', 'data_type' : 'floast'},
+                       {'column_name' : 'kick', 'data_type' : 'float'},
                        {'column_name' : 'kick_ret', 'data_type' : 'float'},
                        {'column_name' : 'punt', 'data_type' : 'float'},
                        {'column_name' : 'punt_ret', 'data_type' : 'float'},
@@ -155,12 +155,40 @@ stat_dicts.append({'table_name' : 'fo_qb',
                        {'column_name' : 'td', 'data_type' : 'integer'},
                        {'column_name' : 'fk', 'data_type' : 'integer'},
                        {'column_name' : 'fl', 'data_type' : 'integer'},
-                       {'column_name' : 'int', 'data_type' : 'integer'},
+                       {'column_name' : 'intThrown', 'data_type' : 'integer'},
                        {'column_name' : 'c_perct', 'data_type' : 'float'},
                        {'column_name' : 'dpi', 'data_type' : 'text'},
                        {'column_name' : 'alex', 'data_type' : 'float'}
                        ],
                    'address' : 'qb', 'table_index' : 0,
+                    'create_table' : True, 'drop_table' : True
+                   })
+
+
+## quarter backs other
+stat_dicts.append({'table_name' : 'fo_qb_other',
+                   'columns' : [
+                       {'column_name' : 'data_year', 'data_type' : 'integer'},
+                       {'column_name' : 'data_week', 'data_type' : 'integer'},
+                       {'column_name' : 'player', 'data_type' : 'text'},
+                       {'column_name' : 'team', 'data_type' : 'text'},
+                       {'column_name' : 'dyar', 'data_type' : 'float'},
+                       {'column_name' : 'yar', 'data_type' : 'float'},
+                       {'column_name' : 'dvoa', 'data_type' : 'float'},
+                       {'column_name' : 'voa', 'data_type' : 'float'},
+                       {'column_name' : 'qbr', 'data_type' : 'float'},
+                       {'column_name' : 'pass', 'data_type' : 'integer'},
+                       {'column_name' : 'yards', 'data_type' : 'integer'},
+                       {'column_name' : 'eyds', 'data_type' : 'integer'},
+                       {'column_name' : 'td', 'data_type' : 'integer'},
+                       {'column_name' : 'fk', 'data_type' : 'integer'},
+                       {'column_name' : 'fl', 'data_type' : 'integer'},
+                       {'column_name' : 'intThrown', 'data_type' : 'integer'},
+                       {'column_name' : 'c_perct', 'data_type' : 'float'},
+                       {'column_name' : 'dpi', 'data_type' : 'text'},
+                       {'column_name' : 'alex', 'data_type' : 'float'}
+                       ],
+                   'address' : 'qb', 'table_index' : 1,
                     'create_table' : True, 'drop_table' : True
                    })
 
@@ -239,6 +267,50 @@ stat_dicts.append({'table_name' : 'fo_rb_receiv',
                     'create_table' : True, 'drop_table' : True
                    })
 
+
+## running backs rush other
+stat_dicts.append({'table_name' : 'fo_rb_rush_other',
+                   'columns' : [
+                       {'column_name' : 'data_year', 'data_type' : 'integer'},
+                       {'column_name' : 'data_week', 'data_type' : 'integer'},
+                       {'column_name' : 'player', 'data_type' : 'text'},
+                       {'column_name' : 'team', 'data_type' : 'text'},
+                       {'column_name' : 'dyar', 'data_type' : 'float'},
+                       {'column_name' : 'yar', 'data_type' : 'float'},
+                       {'column_name' : 'dvoa', 'data_type' : 'float'},
+                       {'column_name' : 'voa', 'data_type' : 'float'},
+                       {'column_name' : 'runs', 'data_type' : 'integer'},
+                       {'column_name' : 'yards', 'data_type' : 'integer'},
+                       {'column_name' : 'eyds', 'data_type' : 'integer'},
+                       {'column_name' : 'td', 'data_type' : 'integer'},
+                       {'column_name' : 'fum', 'data_type' : 'integer'}
+                       ],
+                   'address' : 'rb', 'table_index' : 1,
+                    'create_table' : True, 'drop_table' : True
+                   })
+
+## running backs receiv other
+stat_dicts.append({'table_name' : 'fo_rb_receiv_other',
+                   'columns' : [
+                       {'column_name' : 'data_year', 'data_type' : 'integer'},
+                       {'column_name' : 'data_week', 'data_type' : 'integer'},
+                       {'column_name' : 'player', 'data_type' : 'text'},
+                       {'column_name' : 'team', 'data_type' : 'text'},
+                       {'column_name' : 'dyar', 'data_type' : 'float'},
+                       {'column_name' : 'yar', 'data_type' : 'float'},
+                       {'column_name' : 'dvoa', 'data_type' : 'float'},
+                       {'column_name' : 'voa', 'data_type' : 'float'},
+                       {'column_name' : 'passes', 'data_type' : 'integer'},
+                       {'column_name' : 'yards', 'data_type' : 'integer'},
+                       {'column_name' : 'eyds', 'data_type' : 'integer'},
+                       {'column_name' : 'td', 'data_type' : 'integer'},
+                       {'column_name' : 'catch_rt', 'data_type' : 'float'},
+                       {'column_name' : 'fum', 'data_type' : 'integer'}
+                       ],
+                   'address' : 'rb', 'table_index' : 3,
+                    'create_table' : True, 'drop_table' : True
+                   })
+
 ## te
 stat_dicts.append({'table_name' : 'fo_te',
                    'columns' : [
@@ -287,7 +359,53 @@ stat_dicts.append({'table_name' : 'fo_wr',
                        {'column_name' : 'fum', 'data_type' : 'integer'},
                        {'column_name' : 'dpi', 'data_type' : 'text'}
                        ],
-                   'address' : 'te', 'table_index' : 0,
+                   'address' : 'wr', 'table_index' : 0,
+                    'create_table' : True, 'drop_table' : True
+                   })
+
+## te other
+stat_dicts.append({'table_name' : 'fo_te_other',
+                   'columns' : [
+                       {'column_name' : 'data_year', 'data_type' : 'integer'},
+                       {'column_name' : 'data_week', 'data_type' : 'integer'},
+                       {'column_name' : 'player', 'data_type' : 'text'},
+                       {'column_name' : 'team', 'data_type' : 'text'},
+                       {'column_name' : 'dyar', 'data_type' : 'float'},
+                       {'column_name' : 'yar', 'data_type' : 'float'},
+                       {'column_name' : 'dvoa', 'data_type' : 'float'},
+                       {'column_name' : 'voa', 'data_type' : 'float'},
+                       {'column_name' : 'passes', 'data_type' : 'integer'},
+                       {'column_name' : 'yards', 'data_type' : 'integer'},
+                       {'column_name' : 'eyds', 'data_type' : 'integer'},
+                       {'column_name' : 'td', 'data_type' : 'integer'},
+                       {'column_name' : 'catch_rt', 'data_type' : 'float'},
+                       {'column_name' : 'fum', 'data_type' : 'integer'},
+                       {'column_name' : 'dpi', 'data_type' : 'text'}
+                       ],
+                   'address' : 'te', 'table_index' : 1,
+                    'create_table' : True, 'drop_table' : True
+                   })
+
+## wide receivers other
+stat_dicts.append({'table_name' : 'fo_wr_other',
+                   'columns' : [
+                       {'column_name' : 'data_year', 'data_type' : 'integer'},
+                       {'column_name' : 'data_week', 'data_type' : 'integer'},
+                       {'column_name' : 'player', 'data_type' : 'text'},
+                       {'column_name' : 'team', 'data_type' : 'text'},
+                       {'column_name' : 'dyar', 'data_type' : 'float'},
+                       {'column_name' : 'yar', 'data_type' : 'float'},
+                       {'column_name' : 'dvoa', 'data_type' : 'float'},
+                       {'column_name' : 'voa', 'data_type' : 'float'},
+                       {'column_name' : 'passes', 'data_type' : 'integer'},
+                       {'column_name' : 'yards', 'data_type' : 'integer'},
+                       {'column_name' : 'eyds', 'data_type' : 'integer'},
+                       {'column_name' : 'td', 'data_type' : 'integer'},
+                       {'column_name' : 'catch_rt', 'data_type' : 'float'},
+                       {'column_name' : 'fum', 'data_type' : 'integer'},
+                       {'column_name' : 'dpi', 'data_type' : 'text'}
+                       ],
+                   'address' : 'wr', 'table_index' : 1,
                     'create_table' : True, 'drop_table' : True
                    })
 
@@ -296,6 +414,7 @@ stat_dicts.append({'table_name' : 'fo_ol',
                    'columns' : [
                        {'column_name' : 'data_year', 'data_type' : 'integer'},
                        {'column_name' : 'data_week', 'data_type' : 'integer'},
+                       {'column_name' : 'rn_rank', 'data_type' : 'integer'},
                        {'column_name' : 'rn_team', 'data_type' : 'text'},
                        {'column_name' : 'adj_line_yards', 'data_type' : 'float'},
                        {'column_name' : 'rb_yards', 'data_type' : 'float'},
@@ -321,6 +440,7 @@ stat_dicts.append({'table_name' : 'fo_dl',
                    'columns' : [
                        {'column_name' : 'data_year', 'data_type' : 'integer'},
                        {'column_name' : 'data_week', 'data_type' : 'integer'},
+                       {'column_name' : 'rn_rank', 'data_type' : 'integer'},
                        {'column_name' : 'rn_team', 'data_type' : 'text'},
                        {'column_name' : 'adj_line_yards', 'data_type' : 'float'},
                        {'column_name' : 'rb_yards', 'data_type' : 'float'},
@@ -344,7 +464,7 @@ stat_dicts.append({'table_name' : 'fo_dl',
 
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)
-    url = 'http://www.footballoutsiders.com/stats/'
+
 
     for sql_table in stat_dicts:
 
@@ -366,29 +486,53 @@ with DOConnect() as tunnel:
             c.execute(create_statement)
             conn.commit()
 
-        url2 = url + sql_table['address']
+        
 
-        req = requests.get(url2)
+        yearRange = range(2010,2018)
+        for year in yearRange:
+            url = 'http://www.footballoutsiders.com/stats/'
 
-        xml = bs(req.text,'lxml')
+            url2 = url + sql_table['address']
+            
+            if year != 2017:
+                url2 += str(year)
 
+            req = requests.get(url2)
 
-        table = xml.find_all('table')[sql_table['table_index']]
-        for row in table.find_all('tr'):
-            if len(row.find_all('td')) > 0:
-                if row.find_all('td')[0].get_text() not in ('','Rk','x','Player'):
-                    row_data = []
-                    row_data.append(2017)
-                    row_data.append(17)
-                    for cell in row.find_all('td'):
-                        row_data.append(cell.get_text())
-                    sql_statement = "INSERT INTO scrapped_data." + sql_table['table_name'] + " values( "
-                    for row in row_data:
-                        sql_statement += "'" + str(row) +  "', "
-                    sql_statement = sql_statement[:-2]
-                    sql_statement += ", current_timestamp())"
-                    c.execute(sql_statement)
-                    conn.commit()
+            xml = bs(req.text,'lxml')
+
+            
+            table = xml.find_all('table')[sql_table['table_index']]
+            sql_statement = "INSERT INTO scrapped_data." + sql_table['table_name'] + " (%s) values "
+            for row in table.find_all('tr'):
+                if len(row.find_all('td')) > 0:
+                    if row.find_all('td')[0].get_text() not in ('','Rk','x','Player','RUN BLOCKING'):
+                        row_data = []
+                        row_data.append(year)
+                        row_data.append(17)
+                        for cell in row.find_all('td'):
+                            row_data.append(cell.get_text())
+                        sql_statement += "("
+                        columnStat = ""
+                        for i, cell in enumerate(row_data):
+                            columnStat += sql_table['columns'][i]['column_name']
+                            columnStat += ","
+                            if '%' in str(cell):
+                                cell = cell.replace("%","")
+                                cell = float(cell)/100
+                            cell = str(cell).replace(",","").replace("'","_")
+                            sql_statement += "'" + str(cell) +  "', "
+                        sql_statement += " current_timestamp()),"
+            columnStat += "dataCreate"
+            sql_statement = sql_statement[:-1]
+            sql_statement = sql_statement % columnStat
+            try:
+                c.execute(sql_statement)
+            except Exception as e:
+                print(str(e))
+                print(sql_statement)
+            conn.commit()
+            print("year: "+str(year)+" table: "+sql_table['table_name'])
 
              
 

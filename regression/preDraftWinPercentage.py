@@ -21,27 +21,18 @@ from DOConn import connection
 from DOsshTunnel import DOConnect
 
 
-'''
-create table scrapped_data.draft (draftYear integer, 
-    draftRound integer, draftPick integer, 
-    draftTeam varchar(25), draftPlayer varchar(50),
-    pos varchar(25), age integer,
-    dataCreate datetime,
-    primary key (draftYear, draftRound, draftPick))
-'''
 
+sql = """select a.*, winPoints as points, winWin as wins
+from (
+select draftYear, selectingTeam,
+sum(greatest(pickValue,0)) as draftCapital
 
-sql = """select draftYear, draftRound, draftPick, 
-selectingTeam, player, playerPosition, ifnull(round(points,1),0) as points, 
-ifnull(round(points,1),0) - replacePoints as pointsOverReplace, 
-yearsPro, keeper, preRank, actualPick
- from (
- select a.draftYear as draftYear, 
-      a.draftRound as draftRound, 
-a.draftPick as draftPick,
-a.selectingTeam as selectingTeam,
-a.player as player,
-a.playerPosition as playerPosition,
+from (select a.draftYear,
+a.draftRound, 
+a.draftPick,
+a.selectingTeam,
+a.player,
+a.playerPosition,
 a.playerTeam,
 if(b.draftYear is null,'N','Y') as keeper,
 preRank,
@@ -71,20 +62,13 @@ from la_liga_data.draftData a
 
 left join la_liga_data.keepers b on a.draftYear = b.draftYear and a.player = b.player and a.playerPosition = b.position
 left join scrapped_data.preRanks c on preYear = b.draftYear and prePlayer = b.player and prePosition = position
-where a.draftYear > 2010
- 
- ) draftData
-left join (select statYear, statPlayer, statPosition, 
-sum(totalPoints) as points 
-from scrapped_data.playerStats 
-group by 1,2,3) b on draftYear = statYear and player = statPlayer  
-	and playerPosition = statPosition 
-join analysis.replacementValue on 
-replaceYear = draftYear and replacePosition = 
-playerPosition 
-left join analysis.expectedAdvanced on 
-adYear = draftYear and adPLayer = player and adPosition = playerPosition 
-order by draftYear, draftRound, draftPick
+where a.draftYear between 2011 and 2017
+) b
+left join 
+refData.pickValue on actualPick = pickNumber
+group by 1,2 ) a
+left join la_liga_data.wins on winSeason = draftYear and selectingTeam = winTeam
+
 """
 
 
@@ -94,41 +78,34 @@ with DOConnect() as tunnel:
          
     data = pd.read_sql(sql, con=conn)
 
-    #selectingTeam = 'JJ Burke'
-    #data = data.loc[data['selectingTeam']==selectingTeam]
 
     dataPlot = data
 
-    X = dataPlot['actualPick']
-    X2 = dataPlot['draftPick']
-    Y = dataPlot['pointsOverReplace']
-    def func(x, a, b, c):
-        return a *np.exp(-b*x) + c
+    X = dataPlot['draftCapital']
+    xMin = 0#int(round(min(X),0))
+    xMax = 2000#int(round(max(X),0))
+    X = sm.add_constant(X)
+    Y = dataPlot['wins']
+
+    glm_binom = sm.Logit(Y,X)
+
+
+    xx = range(xMin,xMax)
+
+    xx2 = sm.add_constant(xx)
     
-    popt, pcov = scipy.optimize.curve_fit(func,X,Y)
-    popt2, pcov2 = scipy.optimize.curve_fit(func,X2,Y)
-    xx = range(1,225)
-    yy = func(xx, *popt)
-    yy2 = func(xx, *popt2)
-    sigma_yy = np.sqrt(np.diagonal(pcov))
-    bound_upper = func(xx, *(popt + sigma_yy))
-    bound_lower = func(xx, *(popt - sigma_yy))
-    #fig, ax = plt.subplots()
-    #ax.plot(xx,yy)
+
+    results = glm_binom.fit()
+
+    print(results.summary())
+
+    yy = results.predict(xx2)
+
+    fig, ax = plt.subplots()
+    ax.plot(xx,yy)
     #ax.fill_between(xx,bound_lower,bound_upper,color = 'blue', alpha = .15)
+    plt.show()
 
-    insertSql = "insert into refData.pickValue values "
-    for i, x in enumerate(xx):
-        insertSql += "("
-        insertSql += str(x) + ","
-        insertSql += str(yy2[i]) + ","
-        insertSql += str(yy[i]) + "),"
-
-    insertSql = insertSql[:-1]
-
-    c.execute(insertSql)
-    conn.commit()
-    groups = data.groupby('playerPosition')
     '''
     
     for name, group in groups:

@@ -113,21 +113,12 @@ with DOConnect() as tunnel:
     sigma_yy = np.sqrt(np.diagonal(pcov))
     bound_upper = func(xx, *(popt + sigma_yy))
     bound_lower = func(xx, *(popt - sigma_yy))
-    #fig, ax = plt.subplots()
-    #ax.plot(xx,yy)
-    #ax.fill_between(xx,bound_lower,bound_upper,color = 'blue', alpha = .15)
+    fig, ax = plt.subplots()
+    ax.plot(xx,yy)
+    ax.fill_between(xx,bound_lower,bound_upper,color = 'blue', alpha = .15)
 
-    insertSql = "insert into refData.pickValue values "
-    for i, x in enumerate(xx):
-        insertSql += "("
-        insertSql += str(x) + ","
-        insertSql += str(yy2[i]) + ","
-        insertSql += str(yy[i]) + "),"
+    plt.show()
 
-    insertSql = insertSql[:-1]
-
-    c.execute(insertSql)
-    conn.commit()
     groups = data.groupby('playerPosition')
     '''
     

@@ -66,14 +66,8 @@ elif now.hour < 20:
 else:
     time = 'Night'
     
-#week1 9/11
 
-print(str(year))
-print(str(week))
-print(day)
-print(time)
 
-'''
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)
     try:
@@ -97,4 +91,4 @@ with DOConnect() as tunnel:
 
 
 
-    conn.close()'''
+    conn.close()

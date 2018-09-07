@@ -11,10 +11,10 @@ from references import fullName, pfrAbbrName, fullToMascot, abbrToMascot, teamLo
 fullName = CaseInsensitiveDict(fullName)
 
 
-def pullDepthCharts(season, week, day, time):
+def pullDepthCharts(season, week, day, time, url = 'http://fftoday.com/nfl/depth.php?o=one_page&order_by='):
     sql = "insert into scrapped_data.depthChart values "
 
-    url = 'http://fftoday.com/nfl/depth.php?o=one_page&order_by='
+    #url = 'http://fftoday.com/nfl/depth.php?o=one_page&order_by='
     
     r = requests.get(url)
 

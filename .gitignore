@@ -1,5 +1,6 @@
 #untracked files
 
 security.py
-
+*.pyc
+*.log
 __pycache__/

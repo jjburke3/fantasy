@@ -13,7 +13,7 @@ fullName = CaseInsensitiveDict(fullName)
 
 def pullInjuries(season, week, day, time):
     sql = "insert into scrapped_data.injuries values "
-    if season < 2017:
+    if season < 2017 or season > 2017:
         urlTag = 'injury'
     else:
         urlTag = 'injury_report'

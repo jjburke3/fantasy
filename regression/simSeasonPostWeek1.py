@@ -103,7 +103,7 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
     print('start sim')
 
 
-    for j in range(0,100):
+    for j in range(0,10000):
         print(j)
         teamDict = {}
         

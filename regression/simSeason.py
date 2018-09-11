@@ -89,7 +89,7 @@ left join la_liga_data.wins b on preDraftYear = b.winSeason and b.winWeek > ifnu
     #for j in range(1,1001):
 
 
-    for j in range(0,100):
+    for j in range(0,10000):
         print(j)
         teamDict = {}
         

@@ -8,15 +8,7 @@ sys.path.insert(0,'..')
 from security import fantasy_league
 from references import fullName
 
-
-from DOConn import connection
-from DOsshTunnel import DOConnect
-
-
-
-with DOConnect() as tunnel:
-    c, conn = connection(tunnel)
-
+def pullLeagueData():
     client = ESPNFF(fantasy_league['username'], fantasy_league['password'])
     try:
         client.authorize()
@@ -107,22 +99,15 @@ with DOConnect() as tunnel:
                 True
 
         
-                         
+                             
+                
             
-        
 
-        
+            
 
 
     sqlInsert = sqlInsert[:-1]
     sqlInsert2 = sqlInsert2[:-1]
-
-
-    c.execute(sql % sqlInsert)
-    c.execute(sql2 % sqlInsert2)
     
+    return [sql % sqlInsert, sql2 % sqlInsert2]
 
-    conn.commit()
-
-
-    conn.close()

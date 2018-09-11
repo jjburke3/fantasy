@@ -32,8 +32,9 @@ with DOConnect() as tunnel:
 left join (select winSeason, winTeam, avg(winPoints) as winPoints, max(winWeek) as winWeek
 from la_liga_data.wins
 
-where winWeek <= (select max(winWeek) from la_liga_data.wins where winSeason = 2018)
+where winWeek <= 12
 group by 1,2) a on a.winSeason = preDraftYear and a.winTeam = preDraftTeam
+
 left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.winWeek and a.winTeam = b.winTeam
 	and b.winWeek <= 13""", con=conn)
 
@@ -78,7 +79,7 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
 
     model = sm.OLS(Y2,X2).fit()
     
-    #print(model.rsquared)
+    print(model.rsquared)
     print(model.summary())
 
     predictData = data.loc[data['winSeason'] == 2018]
@@ -106,7 +107,7 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
     print('start sim')
 
 
-    for j in range(0,10000):
+    for j in range(0,1):
         print(j)
         teamDict = {}
         
@@ -332,9 +333,9 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
                      str(highpoints) + "," +
                      str(lowpoints))
 
-        c.execute(sql % sqlString)
+        #c.execute(sql % sqlString)
 
-        conn.commit()
+        #conn.commit()
                      
 
         

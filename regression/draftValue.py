@@ -71,12 +71,13 @@ from la_liga_data.draftData a
 
 left join la_liga_data.keepers b on a.draftYear = b.draftYear and a.player = b.player and a.playerPosition = b.position
 left join scrapped_data.preRanks c on preYear = b.draftYear and prePlayer = b.player and prePosition = position
-where a.draftYear > 2010
+where a.draftYear between 2011 and 2017
  
  ) draftData
 left join (select statYear, statPlayer, statPosition, 
 sum(totalPoints) as points 
-from scrapped_data.playerStats 
+from scrapped_data.playerStats
+where statWeek < 17
 group by 1,2,3) b on draftYear = statYear and player = statPlayer  
 	and playerPosition = statPosition 
 join analysis.replacementValue on 
@@ -99,7 +100,7 @@ with DOConnect() as tunnel:
 
     dataPlot = data
 
-    X = dataPlot['actualPick']
+    X = dataPlot['draftPick']
     X2 = dataPlot['draftPick']
     Y = dataPlot['pointsOverReplace']
     def func(x, a, b, c):

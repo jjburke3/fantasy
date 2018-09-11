@@ -1,13 +1,14 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.linear_model import LinearRegression
+#import seaborn as sns
+#from sklearn.linear_model import LinearRegression
 import statsmodels.api as sm
 
-plt.rc("font", size=14)
+
+'''plt.rc("font", size=14)
 sns.set(style="white")
-sns.set(style="whitegrid", color_codes=True)
+sns.set(style="whitegrid", color_codes=True)'''
 
 import sys
 sys.path.insert(0,'..')
@@ -23,12 +24,13 @@ with DOConnect() as tunnel:
          
     data = pd.read_sql("""select a.winPoints - (select avg(c.winPoints) from 
 	la_liga_data.wins c where c.winWeek <= 13 and c.winSeason = a.winSeason)
- as donePoints, 
+ as donePoints, b.winPoints as weekPoints,
  ifnull(preDraftCapital,(select avg(preDraftCapital) from analysis.preDraftCapital)) as preDraftCapital,
  b.winPoints as predictPoints, lcase(ifnull(a.winTeam,preDraftTeam)) as winTeam, 
  ifnull(a.winSeason,preDraftYear) as winSeason, b.winWeek from analysis.preDraftCapital 
 
-left join la_liga_data.wins a on a.winSeason = preDraftYear and a.winTeam = preDraftTeam and a.winWeek = (select max(winWeek) from la_liga_data.wins where winSeason = 2018)
+left join la_liga_data.wins a on a.winSeason = preDraftYear and a.winTeam = preDraftTeam
+and a.winWeek = (select max(winWeek) from la_liga_data.wins where winSeason = 2018)
 left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.winWeek and a.winTeam = b.winTeam
 	and b.winWeek <= 13""", con=conn)
 
@@ -44,29 +46,37 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
 
     weekStart = standings.iloc[0]['weekNumber'].item()
 
+
     data2 = data.loc[data['winSeason'] <= 2017]
+
+    pointsMean = np.mean(data2['weekPoints'])
+    pointsSd = np.std(data2['weekPoints'])
     def normDist(preDraftCap,donePoints):
-        result = (np.random.normal(coefs['const'],
-                                           se['const'],
-                                           1) +
+        result = (np.random.normal(pointsMean,
+                                           pointsSd,
+                                           1)*(1-model.rsquared) +
+                          (coefs['const']+
                           (np.random.normal(coefs['preDraftCapital'],
                                             se['preDraftCapital'],
                                             1))*preDraftCap +
                           (np.random.normal(coefs['donePoints'],
                                             se['donePoints'],
-                                            1))*donePoints)
+                                            1))*donePoints)*model.rsquared)
         return result
 
-    X = data[['preDraftCapital','donePoints']]
+    X = data[['preDraftCapital']] + data[['donePoints']]
     Y = data['predictPoints']
     X2 = data2[['preDraftCapital','donePoints']]
+    #X2['donePoints'] = X2['donePoints'].map(lambda a: a**2)
     Y2 = data2['predictPoints']
     X2 = sm.add_constant(X2)
     X = sm.add_constant(X)
 
-    reg = LinearRegression()
 
     model = sm.OLS(Y2,X2).fit()
+    
+    #print(model.rsquared)
+    print(model.summary())
 
     predictData = data.loc[data['winSeason'] == 2018]
     summaryData = {}
@@ -81,7 +91,7 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
         summaryData[row['winTeam']]['highpoints'] = []
         summaryData[row['winTeam']]['lowpoints'] = []
 
-    predicts = model.predict(X)
+    #predicts = model.predict(X)
 
     '''for index, row in data.iterrows():
         print(row['winSeason'], row['winWeek'], row['winTeam'], row['predictPoints'], predicts[index])
@@ -93,7 +103,7 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
     print('start sim')
 
 
-    for j in range(0,10000):
+    for j in range(0,100):
         print(j)
         teamDict = {}
         

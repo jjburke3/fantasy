@@ -23,18 +23,32 @@ with DOConnect() as tunnel:
          
     data = pd.read_sql("""select a.winPoints - (select avg(c.winPoints) from 
 	la_liga_data.wins c where c.winWeek <= 13 and c.winSeason = a.winSeason)
- as donePoints, 
+ as donePoints, b.winPoints as weekPoints,
  ifnull(preDraftCapital,(select avg(preDraftCapital) from analysis.preDraftCapital)) as preDraftCapital,
- b.winPoints as predictPoints, ifnull(a.winTeam,preDraftTeam) as winTeam, 
+ b.winPoints as predictPoints, lcase(ifnull(a.winTeam,preDraftTeam)) as winTeam, 
  ifnull(a.winSeason,preDraftYear) as winSeason, b.winWeek from analysis.preDraftCapital 
 
-left join la_liga_data.wins a on a.winSeason = preDraftYear and a.winTeam = preDraftTeam and a.winWeek = 1
-left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.winWeek and a.winTeam = b.winTeam
+left join la_liga_data.wins a on a.winSeason = preDraftYear and a.winTeam = preDraftTeam and a.winWeek = 0
+left join la_liga_data.wins b on preDraftYear = b.winSeason and b.winWeek > ifnull(a.winWeek,0) and preDraftTeam = b.winTeam
 	and b.winWeek <= 13""", con=conn)
 
-    matchups = pd.read_sql("""select * from la_liga_data.matchups;""", con=conn)
+    matchups = pd.read_sql("""select matchYear, matchWeek, lcase(matchTeam) as matchTeam,
+    lcase(matchOpp) as matchOpp from la_liga_data.matchups;""", con=conn)
 
     data2 = data.loc[data['winSeason'] <= 2017]
+
+    pointsMean = np.mean(data2['weekPoints'])
+    pointsSd = np.std(data2['weekPoints'])
+    
+    def normDist(preDraftCap):
+        result = (np.random.normal(pointsMean,
+                                           pointsSd,
+                                           1)*(1-model.rsquared) +
+                          (coefs['const']+
+                          (np.random.normal(coefs['preDraftCapital'],
+                                            se['preDraftCapital'],
+                                            1))*preDraftCap)*model.rsquared)
+        return result
 
 
     X = data[['preDraftCapital']]
@@ -47,6 +61,7 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
     reg = LinearRegression()
 
     model = sm.OLS(Y2,X2).fit()
+    print(model.summary())
 
     predictData = data.loc[data['winSeason'] == 2018]
     summaryData = {}
@@ -74,7 +89,7 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
     #for j in range(1,1001):
 
 
-    for j in range(0,1000):
+    for j in range(0,100):
         print(j)
         teamDict = {}
         
@@ -93,12 +108,7 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
         for i in range(1,14):
             for index, row in predictData.iterrows():
 
-                result = (np.random.normal(coefs['const'],
-                                           se['const'],
-                                           1) +
-                          (np.random.normal(coefs['preDraftCapital'],
-                                            se['preDraftCapital'],
-                                            1))*row['preDraftCapital'])
+                result = normDist(row['preDraftCapital'])
                 teamDict[row['winTeam']]['pointTotals'].append(result[0])
                 matchup = matchups.loc[(matchups['matchWeek'] == i) &
                                        (matchups['matchTeam'] == row['winTeam'])]
@@ -109,7 +119,6 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
             for index, row in predictData.iterrows():
                 pointsScored = teamDict[row['winTeam']]['pointTotals'][i - 1]
                 oppPoints = teamDict[teamDict[row['winTeam']]['matchup'][i-1]]['pointTotals'][i - 1]
-
                 teamDict[row['winTeam']]['wins'].append(pointsScored > oppPoints)
                 teamDict[row['winTeam']]['losses'].append(pointsScored < oppPoints)
                 teamDict[row['winTeam']]['ties'].append(pointsScored == oppPoints)
@@ -172,12 +181,7 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
             teams.append(index)
             preDraftCap = predictData.loc[predictData['winTeam'] == row['team']]['preDraftCapital']
             preDraftCap = preDraftCap.item()
-            scores.append((np.random.normal(coefs['const'],
-                                           se['const'],
-                                           1) +
-                          (np.random.normal(coefs['preDraftCapital'],
-                                            se['preDraftCapital'],
-                                            1))*preDraftCap))
+            scores.append(normDist(preDraftCap))
         advanceTeams = []
 
         if scores[3] > scores[0]:
@@ -198,32 +202,17 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
             teams.append(index)
             preDraftCap = predictData.loc[predictData['winTeam'] == row['team']]['preDraftCapital']
             preDraftCap = preDraftCap.item()
-            scores.append((np.random.normal(coefs['const'],
-                                           se['const'],
-                                           1) +
-                          (np.random.normal(coefs['preDraftCapital'],
-                                            se['preDraftCapital'],
-                                            1))*preDraftCap))
+            scores.append(normDist(preDraftCap))
         for index, row in df[advanceTeams[0]:advanceTeams[0]+1].iterrows():
             teams.append(index)
             preDraftCap = predictData.loc[predictData['winTeam'] == row['team']]['preDraftCapital']
             preDraftCap = preDraftCap.item()
-            scores.append((np.random.normal(coefs['const'],
-                                           se['const'],
-                                           1) +
-                          (np.random.normal(coefs['preDraftCapital'],
-                                            se['preDraftCapital'],
-                                            1))*preDraftCap))
+            scores.append(normDist(preDraftCap))
         for index, row in df[advanceTeams[1]:advanceTeams[1]+1].iterrows():
             teams.append(index)
             preDraftCap = predictData.loc[predictData['winTeam'] == row['team']]['preDraftCapital']
             preDraftCap = preDraftCap.item()
-            scores.append((np.random.normal(coefs['const'],
-                                           se['const'],
-                                           1) +
-                          (np.random.normal(coefs['preDraftCapital'],
-                                            se['preDraftCapital'],
-                                            1))*preDraftCap))
+            scores.append(normDist(preDraftCap))
 
         
         if scores[3] > scores[0]:
@@ -243,22 +232,12 @@ left join la_liga_data.wins b on a.winSeason = b.winSeason and b.winWeek > a.win
             teams.append(index)
             preDraftCap = predictData.loc[predictData['winTeam'] == row['team']]['preDraftCapital']
             preDraftCap = preDraftCap.item()
-            scores.append((np.random.normal(coefs['const'],
-                                           se['const'],
-                                           1) +
-                          (np.random.normal(coefs['preDraftCapital'],
-                                            se['preDraftCapital'],
-                                            1))*preDraftCap))
+            scores.append(normDist(preDraftCap))
         for index, row in df[advanceTeams[1]:advanceTeams[1]+1].iterrows():
             teams.append(index)
             preDraftCap = predictData.loc[predictData['winTeam'] == row['team']]['preDraftCapital']
             preDraftCap = preDraftCap.item()
-            scores.append((np.random.normal(coefs['const'],
-                                           se['const'],
-                                           1) +
-                          (np.random.normal(coefs['preDraftCapital'],
-                                            se['preDraftCapital'],
-                                            1))*preDraftCap))
+            scores.append(normDist(preDraftCap))
 
         if scores[0] > scores[1]:
             champ = teams[0]

@@ -197,10 +197,11 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                     value['ties'].append(value['pointTotals'][i] == value['oppPoints'][i])
             if weekRun > 0:
                 for key,value in teamDict.items():
-                    value['pointTotals'].append(standings.loc[standings['winTeam'] == key]['points'].item())
-                    value['wins'].append(standings.loc[standings['winTeam'] == key]['win'].item())
-                    value['losses'].append(standings.loc[standings['winTeam'] == key]['loss'].item())
-                    value['ties'].append(standings.loc[standings['winTeam'] == key]['ties'].item())
+                    standTeam = standings.loc[standings['winTeam'] == key]
+                    value['pointTotals'].append(standTeam['points'].item())
+                    value['wins'].append(standTeam['win'].item())
+                    value['losses'].append(standTeam['loss'].item())
+                    value['ties'].append(standTeam['ties'].item())
 
 
                 
@@ -334,8 +335,8 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                     summaryData[row['team']]['champ'].append(0)
                 
 
-            
-        print(j, time.time()-start)
+            print(j, time.time()-start)    
+        print(time.time()-start)
             
 
             

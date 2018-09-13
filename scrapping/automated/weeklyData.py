@@ -10,7 +10,7 @@ import calendar
 from DOConn import connection
 from DOsshTunnel import DOConnect
 from playerStats_ffdata import ffData
-from playerStats_pro-football import pftData
+from playerStats_pro_football import pftData
 
 now = datetime.utcnow() - timedelta(hours=4)
 
@@ -63,17 +63,18 @@ with DOConnect() as tunnel:
         sql = ffData(year,week)
         for sqlCode in sql:
             try:
-                c.execute(sql)
+                c.execute(sqlCode)
                 conn.commit()
             except Exception as e:
                 print(str(e))
     except Exception as e:
         print(str(e))
+    print('pftData')
     try:
         sql = pftData(year,week)
         for sqlCode in sql:
             try:
-                c.execute(sql)
+                c.execute(sqlCode)
                 conn.commit()
             except Exception as e:
                 print(str(e))

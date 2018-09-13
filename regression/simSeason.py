@@ -31,7 +31,7 @@ with DOConnect() as tunnel:
  from analysis.preDraftCapital
 left join (select winSeason, winTeam, avg(winPoints) as winPoints, max(winWeek) as winWeek
 from la_liga_data.wins
-where winWeek <= (select max(winWeek) from la_liga_data.wins where winSeason = 2018 and winWeek <= %d)
+where winWeek <= (select max(winWeek) from la_liga_data.wins where winSeason = 2018 and winWeek <= %d and winWeek <= 13)
 group by 1,2) a on a.winSeason = preDraftYear and a.winTeam = preDraftTeam
 left join la_liga_data.wins b on  ifnull(a.winSeason,preDraftYear) = b.winSeason and b.winWeek > ifnull(a.winWeek,0) and ifnull(a.winTeam,preDraftTeam) = b.winTeam
 	and b.winWeek <= 13
@@ -50,12 +50,12 @@ group by winTeam, winSeason""" % weekRun, con=conn)
             where winSeason = 2018 and winWeek <= %d
             group by 1""" % weekRun, con=conn)
 
-    pointTotals = pd.read_sql("""select winPoints from la_liga_data.wins where winWeek < 13""",
+    pointTotals = pd.read_sql("""select winPoints from la_liga_data.wins where winWeek <= 13""",
                               con=conn)
 
     
     pointAverages = pd.read_sql("""select winSeason, winTeam, avg(winPoints) as avgPoints
-            from la_liga_data.wins where winWeek < 13 group by 1,2""",
+            from la_liga_data.wins where winWeek <= 13 group by 1,2""",
                               con=conn)
     data2 = data.loc[data['winSeason'] <= 2017]
 

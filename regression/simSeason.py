@@ -251,6 +251,9 @@ group by winTeam, winSeason""" % weekRun, con=conn)
             #playoffs
             df = df.sort_values(['wins','losses','points'], ascending=[0,1,0])
             df = df.reset_index(drop=True)
+            df['playoffs'] = df.index < 5
+            df = df.sort_values(['playoffs','points'], ascending=[0,0])
+            df = df.reset_index(drop=True)            
             for index, row in df.iterrows():
                 if index < 6:
                     playoff = 1

@@ -39,7 +39,7 @@ defPoints = ifnull(defSack,0)*1 +
     when pointsAgainst between 35 and 45 then -5
     when pointsAgainst > 45 then -7  else 0 end;'''
 
-pointsAmount2 = '''
+    pointAmounts2 = '''
 update scrapped_data.playerStats
 set totalPoints = passPoints + runPoints +
 	receivPoints + fumblePoints + stPoints + kickPoints + defPoints; '''

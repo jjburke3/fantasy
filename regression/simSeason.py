@@ -251,6 +251,8 @@ group by winTeam, winSeason""" % weekRun, con=conn)
             #playoffs
             df = df.sort_values(['wins','losses','points'], ascending=[0,1,0])
             df = df.reset_index(drop=True)
+            df['firstplace'] = df.index < 1
+            df['bye'] = df.index < 2
             df['playoffs'] = df.index < 5
             df = df.sort_values(['playoffs','points'], ascending=[0,0])
             df = df.reset_index(drop=True)
@@ -260,15 +262,14 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                     playoff = 1
                 else:
                     playoff = 0
-                if index < 1:
-                    bye = 1
+                if row['firstplace'] == True:
                     firstplace = 1
-                elif index < 2:
-                    bye = 1
+                else:
                     firstplace = 0
+                if row['bye'] == True:
+                    bye = 1
                 else:
                     bye = 0
-                    firstplace = 0
                 
                 summaryData[row['team']]['playoffs'].append(playoff)
                 summaryData[row['team']]['firstplace'].append(firstplace)

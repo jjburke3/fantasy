@@ -154,6 +154,8 @@ group by winTeam, winSeason""" % weekRun, con=conn)
             summaryData[row['winTeam']]['champ'] = []
             summaryData[row['winTeam']]['highpoints'] = []
             summaryData[row['winTeam']]['lowpoints'] = []
+            summaryData[row['winTeam']]['firstplace'] = []
+            summaryData[row['winTeam']]['bye'] = []
 
         
         coefs = reg.params
@@ -258,7 +260,19 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                     playoff = 1
                 else:
                     playoff = 0
+                if index < 1:
+                    bye = 1
+                    firstplace = 1
+                elif index < 2:
+                    bye = 1
+                    firstplace = 0
+                else:
+                    bye = 0
+                    firstplace = 0
+                
                 summaryData[row['team']]['playoffs'].append(playoff)
+                summaryData[row['team']]['firstplace'].append(firstplace)
+                summaryData[row['team']]['bye'].append(bye)
 
 
                 
@@ -366,13 +380,15 @@ group by winTeam, winSeason""" % weekRun, con=conn)
             highpoints = np.mean(summaryData[row['winTeam']]['highpoints'])
             lowpoints = np.mean(summaryData[row['winTeam']]['lowpoints'])
             champ = np.mean(summaryData[row['winTeam']]['champ'])
+            firstplace = np.mean(summaryData[row['winTeam']]['firstplace'])
+            bye = np.mean(summaryData[row['winTeam']]['bye'])
 
-            print(row['winTeam'], wins, losses, ties, points,playoffs, highpoints, lowpoints,champ)
+            print(row['winTeam'], wins, losses, ties, points,playoffs, highpoints, lowpoints,champ,firstplace,bye)
 
 
             sql = """insert into analysis.standings
                 (standWeek, standType, standTeam, wins, losses, tie, pointsScored, exPointAverage,
-                exWins, playoffsOdds, champOdds, highpoints, lowpoints)
+                exWins, playoffsOdds, champOdds, highpoints, lowpoints,firstplace,bye)
                 values (%s)
                 on duplicate key update
                 wins = values(wins),
@@ -384,7 +400,9 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                 playoffsOdds = values(playoffsOdds),
                 champOdds = values(champOdds),
                 highpoints = values(highpoints),
-                lowpoints = values(lowpoints);"""
+                lowpoints = values(lowpoints),
+                firstplace = values(firstplace),
+                bye = values(bye);"""
 
             sqlString = (str(weekStart) + "," +
                          "'" + model + "'," +
@@ -398,7 +416,9 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                          str(playoffs) + "," +
                          str(champ) + "," +
                          str(highpoints) + "," +
-                         str(lowpoints))
+                         str(lowpoints) + "," +
+                         str(firstplace) + "," +
+                         str(bye))
 
             c.execute(sql % sqlString)
 

@@ -20,7 +20,7 @@ from DOsshTunnel import DOConnect
 
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)
-    weekRun = 13
+    weekRun = sys.argv[1]
          
     data = pd.read_sql("""select avg(a.winPoints)
  as donePoints, 
@@ -126,10 +126,9 @@ group by winTeam, winSeason""" % weekRun, con=conn)
 
     predictData = data.loc[data['winSeason'] == 2018]
 
-    changes = {}
+
 
     for model in models:
-        changes[model] = 0
         if model == 'coin' or (model == 'points' and weekRun == 0):
             usedModel = randModel
             reg = sm.OLS(Y2,X2[['preDraftCapital','const']]).fit()
@@ -155,13 +154,14 @@ group by winTeam, winSeason""" % weekRun, con=conn)
             summaryData[row['winTeam']]['champ'] = []
             summaryData[row['winTeam']]['highpoints'] = []
             summaryData[row['winTeam']]['lowpoints'] = []
+            summaryData[row['winTeam']]['firstplace'] = []
+            summaryData[row['winTeam']]['bye'] = []
 
         
         coefs = reg.params
         se = reg.bse
 
         print('start sim:', model)
-        #for j in range(1,1001):
         
         start = time.time()
         for j in range(0,10000):
@@ -183,11 +183,11 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                 teamDict[row['winTeam']]['ties'] = []
                 
                 teamDict[row['winTeam']]['seasonMean'] = usedModel(row['preDraftCapital'],row['donePoints'])
-            
             for key, value in teamDict.items():
                 value['pointTotals'] = weeklyResults(value['seasonMean'],13-weekStart).tolist()
                 value['matchup'] = matchups.loc[matchups['matchTeam']==key]['matchOpp'].item().split(',')[weekStart:]
-                
+            
+            prior = time.time()
             for key,value in teamDict.items():
                 for i, matchup in enumerate(value['matchup']):
                     value['oppPoints'].append(teamDict[matchup]['pointTotals'][i])
@@ -248,25 +248,41 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                     lowpoints = 0
                 summaryData[row['team']]['highpoints'].append(highpoints)
                 summaryData[row['team']]['lowpoints'].append(lowpoints)
-
             #playoffs
             df = df.sort_values(['wins','losses','points'], ascending=[0,1,0])
             df = df.reset_index(drop=True)
+            df['firstplace'] = df.index < 1
+            df['bye'] = df.index < 2
             df['playoffs'] = df.index < 5
-            df['playoffsOld'] = df.index < 6
             df = df.sort_values(['playoffs','points'], ascending=[0,0])
-            df = df.reset_index(drop=True)            
+            df = df.reset_index(drop=True)
+            df['playoffs'] = df.index < 6            
             for index, row in df.iterrows():
-                if row['playoffsOld'] == True and index >= 6:
-                    changes[model] += 1
                 if index < 6:
                     playoff = 1
                 else:
                     playoff = 0
+                if row['firstplace'] == True:
+                    firstplace = 1
+                else:
+                    firstplace = 0
+                if row['bye'] == True:
+                    bye = 1
+                else:
+                    bye = 0
+                
                 summaryData[row['team']]['playoffs'].append(playoff)
+                summaryData[row['team']]['firstplace'].append(firstplace)
+                summaryData[row['team']]['bye'].append(bye)
 
 
-            
+                
+            df = df.sort_values(['playoffs','wins','losses','points'],
+                                ascending=[0,0,1,0])
+            df = df.reset_index(drop=True)
+
+
+
             #round 1
             scores = []
             teams = []
@@ -287,7 +303,6 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                 advanceTeams.append(teams[1])
 
 
-
             #round 2
 
             scores = []
@@ -305,7 +320,7 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                 seasonMean = teamDict[row['team']]['seasonMean']
                 scores.append(weeklyResults(seasonMean,1))
 
-            
+            advanceTeams = []
             if scores[3] > scores[0]:
                 advanceTeams.append(teams[3])
             else:
@@ -315,7 +330,6 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                 advanceTeams.append(teams[2])
             else:
                 advanceTeams.append(teams[1])
-
             #champ
             scores = []
             teams = []
@@ -340,9 +354,7 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                     summaryData[row['team']]['champ'].append(0)
                 
 
-            print(j, time.time()-start)
-
-        print(changes[model]/10000)
+            print(j, time.time()-start, model)    
         print(time.time()-start)
             
 
@@ -369,13 +381,15 @@ group by winTeam, winSeason""" % weekRun, con=conn)
             highpoints = np.mean(summaryData[row['winTeam']]['highpoints'])
             lowpoints = np.mean(summaryData[row['winTeam']]['lowpoints'])
             champ = np.mean(summaryData[row['winTeam']]['champ'])
+            firstplace = np.mean(summaryData[row['winTeam']]['firstplace'])
+            bye = np.mean(summaryData[row['winTeam']]['bye'])
 
-            #print(row['winTeam'], wins, losses, ties, points,playoffs, highpoints, lowpoints,champ)
+            print(row['winTeam'], wins, losses, ties, points,playoffs, highpoints, lowpoints,champ,firstplace,bye)
 
 
             sql = """insert into analysis.standings
                 (standWeek, standType, standTeam, wins, losses, tie, pointsScored, exPointAverage,
-                exWins, playoffsOdds, champOdds, highpoints, lowpoints)
+                exWins, playoffsOdds, champOdds, highpoints, lowpoints,firstplace,bye)
                 values (%s)
                 on duplicate key update
                 wins = values(wins),
@@ -387,7 +401,9 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                 playoffsOdds = values(playoffsOdds),
                 champOdds = values(champOdds),
                 highpoints = values(highpoints),
-                lowpoints = values(lowpoints);"""
+                lowpoints = values(lowpoints),
+                firstplace = values(firstplace),
+                bye = values(bye);"""
 
             sqlString = (str(weekStart) + "," +
                          "'" + model + "'," +
@@ -401,16 +417,17 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                          str(playoffs) + "," +
                          str(champ) + "," +
                          str(highpoints) + "," +
-                         str(lowpoints))
+                         str(lowpoints) + "," +
+                         str(firstplace) + "," +
+                         str(bye))
 
-            #c.execute(sql % sqlString)
+            c.execute(sql % sqlString)
 
-            #conn.commit()
+            conn.commit()
                          
 
         
 
-    print(changes)
 
 
         

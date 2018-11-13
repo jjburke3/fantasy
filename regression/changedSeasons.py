@@ -20,7 +20,7 @@ from DOsshTunnel import DOConnect
 
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)
-    weekRun = sys.argv[1]
+    weekRun = int(sys.argv[1])
          
     data = pd.read_sql("""select avg(a.winPoints)
  as donePoints, 

@@ -21,21 +21,24 @@ from DOsshTunnel import DOConnect
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)
     weekRun = int(sys.argv[1])
-         
+    
     data = pd.read_sql("""select avg(a.winPoints)
  as donePoints, 
+ avg(weightPoints) as weightPoints,
  avg(ifnull(preDraftCapital,(select avg(preDraftCapital) from analysis.preDraftCapital))) as preDraftCapital,
  avg(b.winPoints) as predictPoints, lcase(ifnull(a.winTeam,preDraftTeam)) as winTeam, 
  ifnull(a.winSeason,preDraftYear) as winSeason,
  max(a.winWeek) as maxWeek
  from analysis.preDraftCapital
-left join (select winSeason, winTeam, avg(winPoints) as winPoints, max(winWeek) as winWeek
+left join (select winSeason, winTeam, avg(winPoints) as winPoints, max(winWeek) as winWeek,
+sum(winPoints*(1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = 2018 and winWeek <= replaceVar and winWeek <= 13)-winWeek)))/
+sum((1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = 2018 and winWeek <= replaceVar and winWeek <= 13)-winWeek))) as weightPoints
 from la_liga_data.wins
-where winWeek <= (select max(winWeek) from la_liga_data.wins where winSeason = 2018 and winWeek <= %d and winWeek <= 13)
+where winWeek <= (select max(winWeek) from la_liga_data.wins where winSeason = 2018 and winWeek <= replaceVar and winWeek <= 13)
 group by 1,2) a on a.winSeason = preDraftYear and a.winTeam = preDraftTeam
 left join la_liga_data.wins b on  ifnull(a.winSeason,preDraftYear) = b.winSeason and b.winWeek > ifnull(a.winWeek,0) and ifnull(a.winTeam,preDraftTeam) = b.winTeam
 	and b.winWeek <= 13
-group by winTeam, winSeason""" % weekRun, con=conn)
+group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
 
     matchups = pd.read_sql("""select matchYear, lcase(matchTeam) as matchTeam,
     group_concat(lcase(matchOpp) order by matchWeek asc) as matchOpp from la_liga_data.matchups
@@ -70,14 +73,14 @@ group by winTeam, winSeason""" % weekRun, con=conn)
         weekStart = standings.iloc[0]['weekNumber'].item()
     models = ['coin','draft','points','all']
 
-    def randModel(preDraftCap,pointsAvg):
+    def randModel(preDraftCap,pointsAvg,weightPoints):
         result = (np.random.normal(randseasonMean,
                                            randseasonSd,
                                            1))
 
         return result
     
-    def draftModel(preDraftCap,pointsAvg):
+    def draftModel(preDraftCap,pointsAvg,weightPoints):
         result = (
                     np.random.normal(coefs['const'],
                                       se['const'],
@@ -88,7 +91,7 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                 )
         return result
     
-    def pointsModel(preDraftCap,pointsAvg):
+    def pointsModel(preDraftCap,pointsAvg,weightPoints):
         result = (
                     np.random.normal(coefs['const'],
                                       se['const'],
@@ -99,7 +102,18 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                 )
         return result
     
-    def allModel(preDraftCap,pointsAvg):
+    def recentPointsModel(preDraftCap,pointsAvg,weightPoints):
+        result = (
+                    np.random.normal(coefs['const'],
+                                      se['const'],
+                                      1)+
+                    (np.random.normal(coefs['weightPoints'],
+                                            se['weightPoints'],
+                                            1))*pointsAvg
+                )
+        return result
+    
+    def allModel(preDraftCap,pointsAvg,weightPoints):
         result = (
                     np.random.normal(coefs['const'],
                                       se['const'],
@@ -119,7 +133,7 @@ group by winTeam, winSeason""" % weekRun, con=conn)
                                            n))
         return result
 
-    X2 = data2[['preDraftCapital','donePoints']]
+    X2 = data2[['preDraftCapital','donePoints','weightPoints']]
     Y2 = data2['predictPoints']
     X2 = sm.add_constant(X2)
 
@@ -129,7 +143,7 @@ group by winTeam, winSeason""" % weekRun, con=conn)
 
 
     for model in models:
-        if model == 'coin' or (model == 'points' and weekRun == 0):
+        if model == 'coin' or ((model == 'points' or model == 'recentPoints') and weekRun == 0):
             usedModel = randModel
             reg = sm.OLS(Y2,X2[['preDraftCapital','const']]).fit()
         elif model == 'draft' or (model == 'all' and weekRun == 0):
@@ -138,9 +152,12 @@ group by winTeam, winSeason""" % weekRun, con=conn)
         elif model == 'points':
             usedModel = pointsModel
             reg = sm.OLS(Y2,X2[['donePoints','const']]).fit()
+        elif model == 'recentPoints':
+            usedModel = recentPointsModel
+            reg = sm.OLS(Y2,X2[['weightPoints','const']]).fit()
         elif model == 'all':
             usedModel = allModel
-            reg = sm.OLS(Y2,X2).fit()
+            reg = sm.OLS(Y2,X2[['donePoints','preDraftCapital','const']]).fit()
 
         #print(reg.summary())
         summaryData = {}
@@ -182,7 +199,7 @@ group by winTeam, winSeason""" % weekRun, con=conn)
 
                 teamDict[row['winTeam']]['ties'] = []
                 
-                teamDict[row['winTeam']]['seasonMean'] = usedModel(row['preDraftCapital'],row['donePoints'])
+                teamDict[row['winTeam']]['seasonMean'] = usedModel(row['preDraftCapital'],row['donePoints'],row['weightPoints'])
             for key, value in teamDict.items():
                 value['pointTotals'] = weeklyResults(value['seasonMean'],13-weekStart).tolist()
                 value['matchup'] = matchups.loc[matchups['matchTeam']==key]['matchOpp'].item().split(',')[weekStart:]
@@ -437,3 +454,4 @@ group by winTeam, winSeason""" % weekRun, con=conn)
 
     
     conn.close()
+

@@ -55,7 +55,7 @@ elif now.date() <= date(year + 1, 1, 5):
 else:
     week = 0
 
-    
+
 
 
 with DOConnect() as tunnel:
@@ -74,8 +74,9 @@ with DOConnect() as tunnel:
         sql = pftData(year,week)
         for sqlCode in sql:
             try:
-                c.execute(sqlCode)
-                conn.commit()
+                temp = 1
+                #c.execute(sqlCode)
+                #conn.commit()
             except Exception as e:
                 print(str(e))
     except Exception as e:
@@ -84,6 +85,7 @@ with DOConnect() as tunnel:
         sql = updateFunc()
         for sqlCode in sql:
             try:
+                temp = 1
                 c.execute(sqlCode)
                 conn.commit()
             except Exception as e:

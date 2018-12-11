@@ -42,13 +42,13 @@ elif now.date() <= date(year, 11, 27):
     week = 12
 elif now.date() <= date(year, 12, 4):
     week = 13
-elif now.date() <= date(year, 12, 11):
+elif now.date() <= date(year, 12, 12):
     week = 14
-elif now.date() <= date(year, 12, 18):
+elif now.date() <= date(year, 12, 19):
     week = 15
-elif now.date() <= date(year, 12, 25):
+elif now.date() <= date(year, 12, 26):
     week = 16
-elif now.date() <= date(year + 1, 1, 1):
+elif now.date() <= date(year + 1, 1, 2):
     week = 17
 else:
     week = 0

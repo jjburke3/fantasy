@@ -339,15 +339,10 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
                 scores.append(weeklyResults(seasonMean,1))
             advanceTeams = []
 
-            if scores[3] > scores[0]:
-                advanceTeams.append(teams[3])
-            else:
-                advanceTeams.append(teams[0])
+            advanceTeams.append(teams[0])
                 
-            if scores[2] > scores[1]:
-                advanceTeams.append(teams[2])
-            else:
-                advanceTeams.append(teams[1])
+
+            advanceTeams.append(teams[1])
 
 
             #round 2
@@ -369,19 +364,11 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
 
             advanceTeams = []
             thirdPlaceTeams = []
-            if scores[3] > scores[0]:
-                advanceTeams.append(teams[3])
-                thirdPlaceTeams.append(teams[0])
-            else:
-                advanceTeams.append(teams[0])
-                thirdPlaceTeams.append(teams[3])
-                
-            if scores[2] > scores[1]:
-                advanceTeams.append(teams[2])
-                thirdPlaceTeams.append(teams[1])
-            else:
-                advanceTeams.append(teams[1])
-                thirdPlaceTeams.append(teams[2])
+            advanceTeams.append(teams[0])
+            thirdPlaceTeams.append(teams[3])
+            
+            advanceTeams.append(teams[2])
+            thirdPlaceTeams.append(teams[1])
             #champ
             scores = []
             teams = []
@@ -468,7 +455,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
             exMoney = np.mean(summaryData[row['winTeam']]['money'])
 
             print(row['winTeam'], wins, losses, ties, points,playoffs, highpoints, lowpoints,champ,firstplace,bye,exWeekHigh,exMoney)
-
+            
 
             sql = """insert into analysis.standings
                 (standWeek, standType, standTeam, wins, losses, tie, weekHigh,
@@ -493,7 +480,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
                 exWeekHigh = values(exWeekHigh),
                 exMoney = values(exMoney);"""
 
-            sqlString = (str(weekStart) + "," +
+            sqlString = (str(15) + "," +
                          "'" + model + "'," +
                          "'" + row['winTeam'] + "'," +
                          str(currentWins) + "," +

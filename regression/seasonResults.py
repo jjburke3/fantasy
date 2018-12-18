@@ -173,6 +173,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
             summaryData[row['winTeam']]['lowpoints'] = []
             summaryData[row['winTeam']]['firstplace'] = []
             summaryData[row['winTeam']]['bye'] = []
+            summaryData[row['winTeam']]['lowAndPlayoffs'] = []
 
         
         coefs = reg.params
@@ -291,6 +292,10 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
                 summaryData[row['team']]['playoffs'].append(playoff)
                 summaryData[row['team']]['firstplace'].append(firstplace)
                 summaryData[row['team']]['bye'].append(bye)
+                if(playoff==1 and summaryData[row['team']]['lowpoints'][-1] == 1):
+                    summaryData[row['team']]['lowAndPlayoffs'].append(1)
+                else:
+                    summaryData[row['team']]['lowAndPlayoffs'].append(0)
 
 
                 
@@ -298,7 +303,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
                                 ascending=[0,0,1,0])
             df = df.reset_index(drop=True)
 
-
+            '''
 
             #round 1
             scores = []
@@ -393,13 +398,14 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
             c.execute(sql)
 
             conn.commit()
-
+            '''
             print(j, time.time()-start, model)    
         print(time.time()-start)
             
 
 
-
+    for index, row in predictData.iterrows():
+        print(row['winTeam'],np.mean(summaryData[row['winTeam']]['lowAndPlayoffs']),np.mean(summaryData[row['winTeam']]['playoffs']))
 
 
         '''sqlString = (str(weekStart) + "," +

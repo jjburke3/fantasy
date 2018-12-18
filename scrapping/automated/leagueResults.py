@@ -40,8 +40,7 @@ def pullLeagueData():
     sqlInsert = ''
     sqlInsert2 = ''
     for team in range(1,15):
-        matchup = league.boxscore(week='',team=team)
-
+        matchup = league.boxscore(week=14,team=team)
         teamId = {1 : 'Andrew Lamb',
                   2 : 'Billy Beirne',
                   3 : 'Tom Buckley',
@@ -55,7 +54,8 @@ def pullLeagueData():
                   11 : 'Ricky Garcia',
                   12 : 'Jordan Hiller',
                   13 : 'Parker King',
-                  14 : 'Mark Krizmanich'}
+                  14 : 'Mark Krizmanich',
+                  0 : ''}
 
         teamName = teamId[matchup['teamId']]
         season = matchup['season']

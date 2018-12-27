@@ -22,13 +22,13 @@ with DOConnect() as tunnel:
     c, conn = connection(tunnel)
     weekRun = 13
          
-    data = pd.read_sql("""select avg(a.winPoints)
+    data = pd.read_sql("""select ifnull(avg(a.winPoints),0)
  as donePoints, 
- avg(weightPoints) as weightPoints,
+ ifnull(avg(weightPoints),0) as weightPoints,
  avg(ifnull(preDraftCapital,(select avg(preDraftCapital) from analysis.preDraftCapital))) as preDraftCapital,
  avg(b.winPoints) as predictPoints, lcase(ifnull(a.winTeam,preDraftTeam)) as winTeam, 
  ifnull(a.winSeason,preDraftYear) as winSeason,
- max(a.winWeek) as maxWeek
+ ifnull(max(a.winWeek),0) as maxWeek
  from analysis.preDraftCapital
 left join (select winSeason, winTeam, avg(winPoints) as winPoints, max(winWeek) as winWeek,
 sum(winPoints*(1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = 2019 and winWeek <= replaceVar)-winWeek)))/

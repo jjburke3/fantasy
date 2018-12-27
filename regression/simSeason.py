@@ -31,10 +31,10 @@ with DOConnect() as tunnel:
  max(a.winWeek) as maxWeek
  from analysis.preDraftCapital
 left join (select winSeason, winTeam, avg(winPoints) as winPoints, max(winWeek) as winWeek,
-sum(winPoints*(1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = 2018 and winWeek <= replaceVar)-winWeek)))/
-sum((1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = 2018 and winWeek <= replaceVar)-winWeek))) as weightPoints
+sum(winPoints*(1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = 2019 and winWeek <= replaceVar)-winWeek)))/
+sum((1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = 2019 and winWeek <= replaceVar)-winWeek))) as weightPoints
 from la_liga_data.wins
-where winWeek <= (select max(winWeek) from la_liga_data.wins where winSeason = 2018 and winWeek <= replaceVar)
+where winWeek <= (select max(winWeek) from la_liga_data.wins where winSeason = 2019 and winWeek <= replaceVar)
 group by 1,2) a on a.winSeason = preDraftYear and a.winTeam = preDraftTeam
 left join la_liga_data.wins b on  ifnull(a.winSeason,preDraftYear) = b.winSeason and b.winWeek > ifnull(a.winWeek,0) and ifnull(a.winTeam,preDraftTeam) = b.winTeam
 	
@@ -55,7 +55,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
                  where a.winSeason = b.winSeason and a.winWeek = b.winWeek)
 				then 1 end) as highPoints
             from la_liga_data.wins b
-            where winSeason = 2018 and winWeek <= %d
+            where winSeason = 2019 and winWeek <= %d
             group by 1""" % weekRun, con=conn)
 
     pointTotals = pd.read_sql("""select winPoints from la_liga_data.wins """,
@@ -65,7 +65,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
     pointAverages = pd.read_sql("""select winSeason, winTeam, avg(winPoints) as avgPoints
             from la_liga_data.wins group by 1,2""",
                               con=conn)
-    data2 = data.loc[data['winSeason'] <= 2017]
+    data2 = data.loc[data['winSeason'] <= 2018]
 
     pointsMean = np.mean(pointTotals['winPoints'])
     pointsSd = np.std(pointTotals['winPoints'])
@@ -471,7 +471,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
 
 
             sql = """insert into analysis.standings
-                (standWeek, standType, standTeam, wins, losses, tie, weekHigh,
+                (standYear, standWeek, standType, standTeam, wins, losses, tie, weekHigh,
                 pointsScored, exPointAverage,
                 exWins, playoffsOdds, champOdds, highpoints, lowpoints,firstplace,bye,
                 exWeekHigh, exMoney)
@@ -493,7 +493,8 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
                 exWeekHigh = values(exWeekHigh),
                 exMoney = values(exMoney);"""
 
-            sqlString = (str(weekStart) + "," +
+            sqlString = (str(2019) + "," +
+                         str(weekStart) + "," +
                          "'" + model + "'," +
                          "'" + row['winTeam'] + "'," +
                          str(currentWins) + "," +

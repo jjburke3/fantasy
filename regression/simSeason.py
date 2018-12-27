@@ -75,7 +75,10 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
     if weekRun == 0:
         weekStart = weekRun
     else:
-        weekStart = standings.iloc[0]['weekNumber'].item()
+        try:
+            weekStart = standings.iloc[0]['weekNumber'].item()
+        except:
+            weekStart = 0
     models = ['recentPoints','coin','draft','points','all']
 
     def randModel(preDraftCap,pointsAvg,weightPoints):

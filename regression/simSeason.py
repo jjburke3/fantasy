@@ -43,20 +43,22 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
     matchups = pd.read_sql("""select matchYear, lcase(matchTeam) as matchTeam,
     group_concat(lcase(matchOpp) order by matchWeek asc) as matchOpp from la_liga_data.matchups
     group by 1,2;""", con=conn)
-
-    standings = pd.read_sql("""select lcase(winTeam) as winTeam, ifnull(count(distinct(winWeek)),0) as weekNumber,
-            sum(winWin) as win,
-            sum(winLoss) as loss,
-            sum(winTie) as ties,
-            sum(winPoints) as points,
-            count(
-				case when winPoints = 
-                (select max(winPoints) from la_liga_data.wins a 
-                 where a.winSeason = b.winSeason and a.winWeek = b.winWeek)
-				then 1 end) as highPoints
-            from la_liga_data.wins b
-            where winSeason = 2019 and winWeek <= %d
-            group by 1""" % weekRun, con=conn)
+    try:
+        standings = pd.read_sql("""select lcase(winTeam) as winTeam, ifnull(count(distinct(winWeek)),0) as weekNumber,
+                sum(winWin) as win,
+                sum(winLoss) as loss,
+                sum(winTie) as ties,
+                sum(winPoints) as points,
+                count(
+                                    case when winPoints = 
+                    (select max(winPoints) from la_liga_data.wins a 
+                     where a.winSeason = b.winSeason and a.winWeek = b.winWeek)
+                                    then 1 end) as highPoints
+                from la_liga_data.wins b
+                where winSeason = 2019 and winWeek <= %d
+                group by 1""" % weekRun, con=conn)
+    except:
+        temp = 1
 
     pointTotals = pd.read_sql("""select winPoints from la_liga_data.wins """,
                               con=conn)

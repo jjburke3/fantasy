@@ -60,10 +60,13 @@ insert into analysis.replacementValue
  where statYear > 2010 and statWeek < 17
  group by 1,2,3
  order by statYear, statPosition, totalPoints desc) a, (select @row := 0, @label := cast('' as char)) t) a
- join (select season, playerPosition, avg(playerCount) as rosterPlayers
+ join (select season, playerPosition, (avg(playerCount)
+ +avg(playingCount))/2 as rosterPlayers
 from (
-select distinct season, week, playerPosition, count(*) as playerCount
+select distinct season, week, playerPosition, count(*) as playerCount,
+count(case when playerSlot not in ('Bench','IR') then season end) as playingCount
  from la_liga_data.pointsScored where week <= 13 and season > 2014
+	
  group by 1,2,3) a group by 1,2) b on (season = statYear or (season = 2015 and statYear < 2015))
 	and statPosition = playerPosition and ceil(rosterPlayers) = rank '''
 

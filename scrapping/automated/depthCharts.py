@@ -13,11 +13,11 @@ fullName = CaseInsensitiveDict(fullName)
 
 
 def pullDepthCharts(season, week, day, time, url = 'https://subscribers.footballguys.com/apps/depthchart.php'):
-    sql = "insert into scrapped_data.depthChart values "
+    sql = "insert into scrapped_data.depthCharts values "
     params = {'type': 'noidp', 'lite':'no','exclude_coaches':'yes'}
     #url = 'https://subscribers.footballguys.com/apps/depthchart.php'
     
-    r = requests.get(url,params=params)
+    r = requests.get(url)
     roles = {'red' : 'Injury Replacement', 'blue' : 'Starter', 'green': 'Situational', 'black' : 'Practice'}
 
     soup = bs(r.content, 'html.parser')
@@ -40,39 +40,44 @@ def pullDepthCharts(season, week, day, time, url = 'https://subscribers.football
                     if child.name == "b":
                         position = child.text[:-1]
                         posRank = 0
-                    elif child.name == "font":
+                    elif child.name == "font" or (position=="Coaches" and child.name=="a"):
                         player = child.text
-                        extra = paren.search(player)
-                        if extra:
-                            extra = extra.group(1)
-                            player = paren.sub('',player)
-                        else:
-                            extra = ''
-                        role = roles[child['color']]
                         injuryStatus = ''
                         tdb = 0
                         gl = 0
                         kr = 0
                         pr = 0
-                        if re.match("IR",extra):
-                            injuryStatus = 'IR'
-                        elif re.match('inj',extra):
-                            injuryStatus = 'Injured'
-                        elif re.match('susp',extra):
-                            injuryStatus = 'Suspended'
-                        elif re.match('res',extra):
-                            injuryStatus = 'Reserve'
-                        elif re.match('PUP',extra):
-                            injuryStatus = 'PUP'
-                        if re.match("3RB",extra):
-                            tdb = 1
-                        if re.match("SD",extra):
-                            gl = 1
-                        if re.match("KR",extra):
-                            kr = 1
-                        if re.match("PR",extra):
-                            pr = 1
-                            
+                        if position =="Coaches":
+                            role = re.sub(': ','',re.sub(', ','',child.previousSibling))
+                        elif child.name == "font":
+                            extra = paren.search(player)
+                            if extra:
+                                extra = extra.group(1)
+                                player = paren.sub('',player)
+                            else:
+                                extra = ''
+                            try:
+                                role = roles[child['color']]
+                            except:
+                                role = "None"
+                            if re.match("IR",extra):
+                                injuryStatus = 'IR'
+                            elif re.match('inj',extra):
+                                injuryStatus = 'Injured'
+                            elif re.match('susp',extra):
+                                injuryStatus = 'Suspended'
+                            elif re.match('res',extra):
+                                injuryStatus = 'Reserve'
+                            elif re.match('PUP',extra):
+                                injuryStatus = 'PUP'
+                            if re.match("3RB",extra):
+                                tdb = 1
+                            if re.match("SD",extra):
+                                gl = 1
+                            if re.match("KR",extra):
+                                kr = 1
+                            if re.match("PR",extra):
+                                pr = 1
                         sql += ("(" +
                                 str(season) + "," +
                                 str(week) + "," +
@@ -81,7 +86,7 @@ def pullDepthCharts(season, week, day, time, url = 'https://subscribers.football
                                 "'" + teamName + "'," +
                                 "'" + position + "'," +
                                 str(posRank) + "," +
-                                "'" + player + "'," +
+                                "'" + player.replace("'","_").replace("′","_") + "'," +
                                 "'" + role + "'," +
                                 "'" + injuryStatus + "'," +
                                 "'" + str(tdb) + "'," +
@@ -98,6 +103,5 @@ def pullDepthCharts(season, week, day, time, url = 'https://subscribers.football
 
     
     return sql
-
 
 

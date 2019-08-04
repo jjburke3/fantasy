@@ -1,5 +1,6 @@
 
 import requests
+import re
 from bs4 import BeautifulSoup as bs, Comment
 import sys
 from requests.structures import CaseInsensitiveDict
@@ -11,57 +12,92 @@ from references import fullName, pfrAbbrName, fullToMascot, abbrToMascot, teamLo
 fullName = CaseInsensitiveDict(fullName)
 
 
-def pullDepthCharts(season, week, day, time, url = 'http://fftoday.com/nfl/depth.php?o=one_page&order_by='):
+def pullDepthCharts(season, week, day, time, url = 'https://subscribers.footballguys.com/apps/depthchart.php'):
     sql = "insert into scrapped_data.depthChart values "
-
-    #url = 'http://fftoday.com/nfl/depth.php?o=one_page&order_by='
+    params = {'type': 'noidp', 'lite':'no','exclude_coaches':'yes'}
+    #url = 'https://subscribers.footballguys.com/apps/depthchart.php'
     
-    r = requests.get(url)
+    r = requests.get(url,params=params)
+    roles = {'red' : 'Injury Replacement', 'blue' : 'Starter', 'green': 'Situational', 'black' : 'Practice'}
 
     soup = bs(r.content, 'html.parser')
-    tables = soup.find_all('table')[7]
+    tables = soup.find_all('td', {"class":"la","width" : "50%"})
 
-    team = ''
-    i = 0
-    for tr in tables.find_all('tr',recursive=False):
-        charts = tr.find_all('td',recursive=False)
+    paren = re.compile(" \((.+)\)")
 
-        for chart in charts:
-            chartTable = chart.find('table').find("table")
-            teamRows = chartTable.find_all('tr',recursive=False)
-            team = teamRows[0].find('td').get_text()
+    for column in tables:
+        teamRows = column.find_all("tr")
+        teamName = ''
+        for i, team in enumerate(teamRows):
+            if i % 2 == 0:
+                teamName = team.find("b").text
+            else:
+                children = team.find("td").findChildren()
+                position = ''
+                posRank = 0
+                
+                for child in children:
+                    if child.name == "b":
+                        position = child.text[:-1]
+                        posRank = 0
+                    elif child.name == "font":
+                        player = child.text
+                        extra = paren.search(player)
+                        if extra:
+                            extra = extra.group(1)
+                            player = paren.sub('',player)
+                        else:
+                            extra = ''
+                        role = roles[child['color']]
+                        injuryStatus = ''
+                        tdb = 0
+                        gl = 0
+                        kr = 0
+                        pr = 0
+                        if re.match("IR",extra):
+                            injuryStatus = 'IR'
+                        elif re.match('inj',extra):
+                            injuryStatus = 'Injured'
+                        elif re.match('susp',extra):
+                            injuryStatus = 'Suspended'
+                        elif re.match('res',extra):
+                            injuryStatus = 'Reserve'
+                        elif re.match('PUP',extra):
+                            injuryStatus = 'PUP'
+                        if re.match("3RB",extra):
+                            tdb = 1
+                        if re.match("SD",extra):
+                            gl = 1
+                        if re.match("KR",extra):
+                            kr = 1
+                        if re.match("PR",extra):
+                            pr = 1
+                            
+                        sql += ("(" +
+                                str(season) + "," +
+                                str(week) + "," +
+                                "'" + str(day) + "'," +
+                                "'" + str(time) + "'," +
+                                "'" + teamName + "'," +
+                                "'" + position + "'," +
+                                str(posRank) + "," +
+                                "'" + player + "'," +
+                                "'" + role + "'," +
+                                "'" + injuryStatus + "'," +
+                                "'" + str(tdb) + "'," +
+                                "'" + str(gl) + "'," +
+                                "'" + str(kr) + "'," +
+                                "'" + str(pr) + "'," +
+                                
+                                "current_timestamp()),")
+                        posRank += 1
 
-            try:
-                team = fullName[team.replace(' ',' ')]
-            except:
-                True
+                        
 
-            for row in teamRows[2:]:
-                cells = row.find_all('td')
-                fanPos = cells[0].get_text()
-                teamPos = cells[1].get_text()
-                player = cells[2].find('a')['href']
-                player = player[player.rfind('/')+1:]
-                player = player.replace("_"," ").replace("'","_")
-
-                sql += ("(" + str(season) + "," +
-                        str(week) + "," +
-                        "'" + day + "'," +
-                        "'" + time + "'," +
-                        str(i) + "," +
-                        "'" + team + "'," +
-                        "'" + fanPos + "'," +
-                        "'" + teamPos + "'," +
-                        "'" + player + "'),")
-                i += 1
-
-    
     sql = sql[:-1]
 
-
+    
     return sql
-
-
 
 
 

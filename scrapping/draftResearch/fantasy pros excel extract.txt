@@ -1,0 +1,41 @@
+https://draftwizard.fantasypros.com/football/cheat-sheets/
+
+delete from draft.allrankings where rankYear = 2019 and rankWeek = 0;
+
+insert into draft.allrankings(rankYear, rankWeek, rankPlayer, rankPosition, fantasyProsRank, averageRank)
+values
+
+=IF(MOD(ROW(A6)-1,5)=0,"(2019,0,'"&IFERROR(VLOOKUP(SUBSTITUTE(LEFT(A6,FIND(",",A6)-1),"'","_"),$M$1:$N$32,2,FALSE),SUBSTITUTE(LEFT(A6,FIND(",",A6)-1),"'","_"))&"','"&SUBSTITUTE(MID(A6,FIND(",",A6)+2,FIND("-",A6,FIND(",",A6))-FIND(",",A6)-3),"DST","D/ST")&"',"&A5&","&A5&"),","")
+
+Arizona Cardinals	Cardinals D/ST
+Atlanta Falcons	Falcons D/ST
+Baltimore Ravens	Ravens D/ST
+New Orleans Saints	Saints D/ST
+Tampa Bay Buccaneers	Buccaneers D/ST
+Carolina Panthers	Panthers D/ST
+New York Giants	Giants D/ST
+Philadelphia Eagles	Eagles D/ST
+Dallas Cowboys	Cowboys D/ST
+Washington Redskins	Redskins D/ST
+Detroit Lions	Lions D/ST
+Minnesota Vikings	Vikings D/ST
+Green Bay Packers	Packers D/ST
+Chicago Bears	Bears D/ST
+San Francisco 49ers	49ers D/ST
+Seattle Seahawks	Seahawks D/ST
+Los Angeles Rams	Rams D/ST
+Los Angeles Chargers	Chargers D/ST
+Denver Broncos	Broncos D/ST
+Oakland Raiders	Raiders D/ST
+Kansas City Chiefs	Chiefs D/ST
+Pittsburgh Steelers	Steelers D/ST
+Cleveland Browns	Browns D/ST
+Cincinnati Bengals	Bengals D/ST
+Jacksonville Jaguars	Jaguars D/ST
+Indianapolis Colts	Colts D/ST
+Houston Texans	Texans D/ST
+Tennessee Titans	Titans D/ST
+New England Patriots	Patriots D/ST
+Buffalo Bills	Bills D/ST
+Miami Dolphins	Dolphins D/ST
+New York Jets	Jets D/ST

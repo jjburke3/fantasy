@@ -12,63 +12,60 @@ fullName = CaseInsensitiveDict(fullName)
 
 
 def pullInjuries(season, week, day, time):
-    sql = "insert into scrapped_data.injuries values "
-    if season < 2017 or season > 2017:
-        urlTag = 'injury'
-    else:
-        urlTag = 'injury_report'
+    sql = 'insert into scrapped_data.injuries values '
 
-    url = ('http://fftoday.com/nfl/%d_%s_wk%d.html' %
-        (int(str(season)[-2:]), urlTag, week))
-
-    r = requests.get(url)
-
-    soup = bs(r.content, 'html.parser')
-
-    table = soup.find_all('table', {'class' : 'smallbody'})[0]
-
-    team = ''
-
-    i = 0
-    for tr in table.find_all('tr'):
-        tds = tr.find_all('td')
-        if len(tds) > 1 and tds[0].get_text() not in ('Name',''):
-            if tds[1].get_text() == '':
-                team = tds[0].get_text()
-                team = team.replace(' ',' ')
-                try:
-                    team = fullName[team]
-                except:
-                    True
-                try:
-                    team = teamLocation[team]
-                except:
-                    True
-                try:
-                    team = fullName[team.replace(' Injuries','')]
-                except:
-                    True
-
-            else:
-                player = tds[0].get_text()
-                position = tds[1].get_text()
-                injury = tds[2].get_text()
-                if len(tds) == 5:
-                    gameStatus = tds[4].get_text()
-                else:
-                    gameStatus = tds[3].get_text()
+    teamsUrl = "https://www.rotoworld.com/api/team/football?sort=locale&filter%5Bactive%5D=1&filter%5Bleague%5D=21&include=secondary_logo"
 
 
-                sql += ("(" + str(season) + "," + str(week) + "," +
-                        "'" + day + "','" + time + "'," + str(i) + "," +
+    teamsR = requests.get(teamsUrl).json()['data']
+    
+    url2 = 'https://www.rotoworld.com/api/injury?sort=-start_date&filter%5Bplayer.team%5D='
+    url3 = '&filter%5Bplayer.status.active%5D=1&filter%5Bactive%5D=1&include=injury_type,player,player.status,player.position'
+    url = 'https://www.rotoworld.com/api/injury'
+
+    for teamLink in teamsR:
+        r = requests.get(url2 + str(teamLink['attributes']['id']) + url3)
+
+        data = r.json()
+        for injury in data['data']:
+            if injury['relationships']['player']['data']['type'] == "player--football":
+                injId = injury['id']
+                attributes = {
+                    'status' : injury['attributes']['return_estimate'],
+                    'startDate' : injury['attributes']['start_date'],
+                    'endDate' : injury['attributes']['end_date'],
+                    'outlook' : injury['attributes']['outlook'],
+                    'active' : injury['attributes']['active']
+                    }
+                playerData = requests.get(url + "/" + injId + "/player").json()['data']
+                playerName = playerData['attributes']['name']
+
+                injuryData = requests.get(url + "/" + injId + "/injury_type").json()['data']
+                injuryName = injuryData['attributes']['name']
+
+                positionUrl = playerData['relationships']['position']['links']['related']
+                teamUrl = playerData['relationships']['team']['links']['related']
+                team = requests.get(teamUrl).json()['data']['attributes']['abbreviation']
+                print(team)
+                position = requests.get(positionUrl).json()['data']['attributes']['abbreviation']
+                statusUrl = playerData['relationships']['status']['links']['related']
+                status = requests.get(statusUrl).json()['data']['attributes']['name']
+
+                sql += ("(" +
+                        str(season) + "," +
+                        str(week) + "," +
+                        "'" + day + "'," +
+                        "'" + time + "'," +
+                        "'" + injId + "'," +
                         "'" + team + "'," +
-                        "'" + player.replace("'","_").replace("’","_") + "'," +
-                        "'" + position + "'," +
-                        "'" + injury.replace("'","_") + "'," +
-                        "'" + gameStatus.replace("'","_") + "'),")
-
-                i += 1
-
+                        "'" + playerName.replace("'","_") + "'," +
+                        "'" + position.replace("'","_") + "'," +
+                        "'" + injuryName.replace("'","_") + "'," +
+                        "'" + status.replace("'","_") + "'," +
+                        ('null' if attributes['startDate'] == None else "'" +str(attributes['startDate']) + "'") + "," +
+                        ('null' if attributes['endDate'] == None else "'" +str(attributes['endDate']) + "'") + "," +
+                        "'" + str(attributes['outlook']) + "'),"
+                        )
 
 
     sql = sql[:-1]

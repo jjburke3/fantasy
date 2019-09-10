@@ -8,7 +8,7 @@ sys.path.insert(0,'..')
 from security import fantasy_league
 from references import fullName
 
-def pullLeagueData():
+def pullLeagueData(year,week):
     client = ESPNFF(fantasy_league['username'], fantasy_league['password'])
     try:
         client.authorize()
@@ -16,13 +16,14 @@ def pullLeagueData():
         print('failed to authorize')
 
 
-    league = client.get_league(fantasy_league['league_id'], 2018)
+    league = client.get_league(fantasy_league['league_id'], 2019)
 
     sql = """insert into la_liga_data.pointsScored values %s
             on duplicate key update
             vsTeam = values(vsTeam),
             player = values(player),
             playerTeam = values(playerTeam),
+            playerId = values(playerId),
             playerSlot = values(playerSlot),
             playerPosition = values(playerPosition),
             playerPosition2 = values(playerPosition2),
@@ -40,7 +41,7 @@ def pullLeagueData():
     sqlInsert = ''
     sqlInsert2 = ''
     for team in range(1,15):
-        matchup = league.boxscore(week=14,team=team)
+        matchup = league.boxscore(week=week,team=team)
         teamId = {1 : 'Andrew Lamb',
                   2 : 'Billy Beirne',
                   3 : 'Tom Buckley',
@@ -61,7 +62,7 @@ def pullLeagueData():
         season = matchup['season']
         week = matchup['week']
         teamPoints = matchup['teamPoints']
-        opp = teamId[matchup['opponentId']]
+        opp = matchup['opponentName']
         oppPoints = matchup['opponentPoints']
         win = int(teamPoints > oppPoints)
         loss = int(teamPoints < oppPoints)
@@ -87,9 +88,11 @@ def pullLeagueData():
                              str(i) + "," +
                              "'" + opp + "'," +
                              "'" + player['playerName'].replace("'","_") + "'," +
+                             str(player['playerId']) + "," +
                              "'" + fullName[player['playerTeam']] + "'," +
                               "'" + player['slot'] + "'," +
                               "'" + player['playerPos'] + "'," +
+                              "null," +
                               "null," +
                               "null," +
                               "null," +

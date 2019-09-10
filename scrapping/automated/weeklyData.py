@@ -16,41 +16,41 @@ from updateQueries import updateFunc
 now = datetime.utcnow() - timedelta(hours=4)
 
 
-year = 2018
+year = 2019
 
-if now.date() <= date(year, 9, 15) and now.date() >= date(year,9,8):
+if now.date() <= date(year, 9, 10) and now.date() >= date(year,9,3):
     week = 1
-elif now.date() <= date(year, 9, 22):
+elif now.date() <= date(year, 9, 17):
     week = 2
-elif now.date() <= date(year, 9, 29):
+elif now.date() <= date(year, 9, 24):
     week = 3
-elif now.date() <= date(year, 10, 6):
+elif now.date() <= date(year, 10, 1):
     week = 4
-elif now.date() <= date(year, 10, 13):
+elif now.date() <= date(year, 10, 8):
     week = 5
-elif now.date() <= date(year, 10, 20):
+elif now.date() <= date(year, 10, 15):
     week = 6
-elif now.date() <= date(year, 10, 27):
+elif now.date() <= date(year, 10, 22):
     week = 7
-elif now.date() <= date(year, 11, 3):
+elif now.date() <= date(year, 10, 29):
     week = 8
-elif now.date() <= date(year, 11, 10):
+elif now.date() <= date(year, 11, 5):
     week = 9
-elif now.date() <= date(year, 11, 17):
+elif now.date() <= date(year, 11, 12):
     week = 10
-elif now.date() <= date(year, 11, 24):
+elif now.date() <= date(year, 11, 19):
     week = 11
-elif now.date() <= date(year, 12, 1):
+elif now.date() <= date(year, 11, 26):
     week = 12
-elif now.date() <= date(year, 12, 8):
+elif now.date() <= date(year, 12, 3):
     week = 13
-elif now.date() <= date(year, 12, 15):
+elif now.date() <= date(year, 12, 10):
     week = 14
-elif now.date() <= date(year, 12, 22):
+elif now.date() <= date(year, 12, 17):
     week = 15
-elif now.date() <= date(year, 12, 29):
+elif now.date() <= date(year, 12, 24):
     week = 16
-elif now.date() <= date(year + 1, 1, 5):
+elif now.date() <= date(year, 12,31):
     week = 17
 else:
     week = 0

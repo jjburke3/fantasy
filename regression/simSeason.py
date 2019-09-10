@@ -21,6 +21,7 @@ from DOsshTunnel import DOConnect
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)
     weekRun = 13
+    year = 2019
          
     data = pd.read_sql("""select ifnull(avg(a.winPoints),0)
  as donePoints, 
@@ -31,18 +32,19 @@ with DOConnect() as tunnel:
  ifnull(max(a.winWeek),0) as maxWeek
  from analysis.preDraftCapital
 left join (select winSeason, winTeam, avg(winPoints) as winPoints, max(winWeek) as winWeek,
-sum(winPoints*(1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = 2019 and winWeek <= replaceVar)-winWeek)))/
-sum((1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = 2019 and winWeek <= replaceVar)-winWeek))) as weightPoints
+sum(winPoints*(1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = YEAR_HOLDER and winWeek <= replaceVar)-winWeek)))/
+sum((1-.05*((select max(winWeek) from la_liga_data.wins where winSeason = YEAR_HOLDER and winWeek <= replaceVar)-winWeek))) as weightPoints
 from la_liga_data.wins
-where winWeek <= (select max(winWeek) from la_liga_data.wins where winSeason = 2019 and winWeek <= replaceVar)
+where winWeek <= (select max(winWeek) from la_liga_data.wins where winSeason = YEAR_HOLDER and winWeek <= replaceVar)
 group by 1,2) a on a.winSeason = preDraftYear and a.winTeam = preDraftTeam
 left join la_liga_data.wins b on  ifnull(a.winSeason,preDraftYear) = b.winSeason and b.winWeek > ifnull(a.winWeek,0) and ifnull(a.winTeam,preDraftTeam) = b.winTeam
 	
-group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
+group by winTeam, winSeason""".replace('replaceVar',str(weekRun)).replace("YEAR_HOLDER",str(year)), con=conn)
 
     matchups = pd.read_sql("""select matchYear, lcase(matchTeam) as matchTeam,
     group_concat(lcase(matchOpp) order by matchWeek asc) as matchOpp from la_liga_data.matchups
-    group by 1,2;""", con=conn)
+    where matchUpYear = %d
+    group by 1,2;""" % year, con=conn)
     try:
         standings = pd.read_sql("""select lcase(winTeam) as winTeam, ifnull(count(distinct(winWeek)),0) as weekNumber,
                 sum(winWin) as win,
@@ -55,8 +57,8 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
                      where a.winSeason = b.winSeason and a.winWeek = b.winWeek)
                                     then 1 end) as highPoints
                 from la_liga_data.wins b
-                where winSeason = 2019 and winWeek <= %d
-                group by 1""" % weekRun, con=conn)
+                where winSeason = %d and winWeek <= %d
+                group by 1""" % (year,weekRun), con=conn)
     except:
         temp = 1
 
@@ -67,7 +69,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
     pointAverages = pd.read_sql("""select winSeason, winTeam, avg(winPoints) as avgPoints
             from la_liga_data.wins group by 1,2""",
                               con=conn)
-    data2 = data.loc[data['winSeason'] <= 2018]
+    data2 = data.loc[data['winSeason'] <= (year - 1)]
 
     pointsMean = np.mean(pointTotals['winPoints'])
     pointsSd = np.std(pointTotals['winPoints'])
@@ -81,7 +83,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)), con=conn)
             weekStart = standings.iloc[0]['weekNumber'].item()
         except:
             weekStart = 0
-    models = ['recentPoints','coin','draft','points','all']
+    models = ['draft','points']
 
     def randModel(preDraftCap,pointsAvg,weightPoints):
         result = (np.random.normal(randseasonMean,

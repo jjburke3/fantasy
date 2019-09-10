@@ -150,7 +150,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)).replace("YEAR_
     X2 = sm.add_constant(X2)
 
 
-    predictData = data.loc[data['winSeason'] == 2018]
+    predictData = data.loc[data['winSeason'] == year]
 
 
 
@@ -500,7 +500,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)).replace("YEAR_
                 exWeekHigh = values(exWeekHigh),
                 exMoney = values(exMoney);"""
 
-            sqlString = (str(2019) + "," +
+            sqlString = (str(year) + "," +
                          str(weekStart) + "," +
                          "'" + model + "'," +
                          "'" + row['winTeam'] + "'," +

@@ -43,7 +43,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)).replace("YEAR_
 
     matchups = pd.read_sql("""select matchYear, lcase(matchTeam) as matchTeam,
     group_concat(lcase(matchOpp) order by matchWeek asc) as matchOpp from la_liga_data.matchups
-    where matchUpYear = %d
+    where matchYear = %d
     group by 1,2;""" % year, con=conn)
     try:
         standings = pd.read_sql("""select lcase(winTeam) as winTeam, ifnull(count(distinct(winWeek)),0) as weekNumber,

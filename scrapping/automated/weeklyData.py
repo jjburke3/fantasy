@@ -18,39 +18,39 @@ now = datetime.utcnow() - timedelta(hours=4)
 
 year = 2019
 
-if now.date() <= date(year, 9, 10) and now.date() >= date(year,9,3):
+if now.date() <= date(year, 9, 13) and now.date() >= date(year,9,3):
     week = 1
-elif now.date() <= date(year, 9, 17):
+elif now.date() <= date(year, 9, 20):
     week = 2
-elif now.date() <= date(year, 9, 24):
+elif now.date() <= date(year, 9, 27):
     week = 3
-elif now.date() <= date(year, 10, 1):
+elif now.date() <= date(year, 10, 4):
     week = 4
-elif now.date() <= date(year, 10, 8):
+elif now.date() <= date(year, 10, 11):
     week = 5
-elif now.date() <= date(year, 10, 15):
+elif now.date() <= date(year, 10, 18):
     week = 6
-elif now.date() <= date(year, 10, 22):
+elif now.date() <= date(year, 10, 25):
     week = 7
-elif now.date() <= date(year, 10, 29):
+elif now.date() <= date(year, 11, 1):
     week = 8
-elif now.date() <= date(year, 11, 5):
+elif now.date() <= date(year, 11, 8):
     week = 9
-elif now.date() <= date(year, 11, 12):
+elif now.date() <= date(year, 11, 15):
     week = 10
-elif now.date() <= date(year, 11, 19):
+elif now.date() <= date(year, 11, 22):
     week = 11
-elif now.date() <= date(year, 11, 26):
+elif now.date() <= date(year, 11, 29):
     week = 12
-elif now.date() <= date(year, 12, 3):
+elif now.date() <= date(year, 12, 6):
     week = 13
-elif now.date() <= date(year, 12, 10):
+elif now.date() <= date(year, 12, 13):
     week = 14
-elif now.date() <= date(year, 12, 17):
+elif now.date() <= date(year, 12, 20):
     week = 15
-elif now.date() <= date(year, 12, 24):
+elif now.date() <= date(year, 12, 27):
     week = 16
-elif now.date() <= date(year, 12,31):
+elif now.date() <= date(year+1,1,3):
     week = 17
 else:
     week = 0

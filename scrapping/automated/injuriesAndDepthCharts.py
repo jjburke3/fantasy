@@ -66,7 +66,6 @@ elif now.hour < 20:
 else:
     time = 'Night'
     
-week = 1
 
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)

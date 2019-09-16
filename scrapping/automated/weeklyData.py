@@ -12,6 +12,7 @@ from DOsshTunnel import DOConnect
 from playerStats_ffdata import ffData
 from playerStats_pro_football import pftData
 from updateQueries import updateFunc
+from ohmysportsfeeds import returnWeekStats
 
 now = datetime.utcnow() - timedelta(hours=4)
 
@@ -61,13 +62,12 @@ else:
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)
     try:
-        sql = ffData(year,week)
-        for sqlCode in sql:
-            try:
-                c.execute(sqlCode)
-                conn.commit()
-            except Exception as e:
-                print(str(e))
+        sql = returnWeekStats(week,2019)
+        try:
+            c.execute(sql)
+            conn.commit()
+        except Exception as e:
+            print(sql)
     except Exception as e:
         print(str(e))
     try:

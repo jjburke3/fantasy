@@ -37,7 +37,7 @@ def returnWeekStats(week,year=2019,week_range="from-5-days-ago-to-today"):
         r = requests.get(url % season,
                      params=params,
                      headers=headers)
-        print(r)
+        print(r,year,week,i)
         try:
             output = r.json()
             for player in output['playergamelogs']['gamelogs']:

@@ -158,7 +158,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)).replace("YEAR_
         if model == 'coin' or ((model == 'points' or model == 'recentPoints') and weekRun == 0):
             usedModel = randModel
             reg = sm.OLS(Y2,X2[['preDraftCapital','const']]).fit()
-        elif model == 'draft' or (model == 'all' and weekRun == 0):
+        elif (model == 'all' and weekRun == 0):
             usedModel = draftModel
             reg = sm.OLS(Y2,X2[['preDraftCapital','const']]).fit()
         elif model == 'points':
@@ -167,7 +167,7 @@ group by winTeam, winSeason""".replace('replaceVar',str(weekRun)).replace("YEAR_
         elif model == 'recentPoints':
             usedModel = recentPointsModel
             reg = sm.OLS(Y2,X2[['weightPoints','const']]).fit()
-        elif model == 'all':
+        elif model == 'draft':
             usedModel = allModel
             reg = sm.OLS(Y2,X2[['donePoints','preDraftCapital','const']]).fit()
 

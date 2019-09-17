@@ -37,7 +37,7 @@ def returnWeekStats(week,year=2019,week_range="from-5-days-ago-to-today"):
         r = requests.get(url % season,
                      params=params,
                      headers=headers)
-        print(r,year,week,i)
+        print(year,week,i)
         try:
             output = r.json()
             for player in output['playergamelogs']['gamelogs']:
@@ -148,85 +148,87 @@ def returnWeekStats(week,year=2019,week_range="from-5-days-ago-to-today"):
         r2 = requests.get(teamUrl % season,
                      params=params,
                      headers=headers)
-
+        time.sleep(5)
+        print(r2)
         try:
             output = r2.json()
-            teamData = output['teamgamelogs']['gamelogs'][0]
-            name = teamData['team']['Name'] + " D/ST"
-            team = teamData['team']['Abbreviation']
-            pos = 'D/ST'
-            games = 1
-            defSack = attemptStat("Sacks",obj)
-            qbHit = attemptStat("",obj)
-            forceFumble = attemptStat("FumForced",obj)
-            fumbleRecov = attemptStat("FumOppRec",obj)
-            defInt = attemptStat("Interceptions",obj)
-            passDef = attemptStat("PassesDefended",obj)
-            defTD = attemptStat("FumTD",obj)+attemptStat("IntTD",obj)
-            fumbleTD = attemptStat("FumTD",obj)
-            intTD = attemptStat("IntTD",obj)
-            puntTD = attemptStat("PrTD",obj)
-            kickTD = attemptStat("KrTD",obj)
-            pointsAgainst = attemptStat("PointsAgainst",obj)
-            defPassYards = attemptStat("",obj)
-            defRunYards = attemptStat("",obj)
-            safety = attemptStat("Safeties",obj)
-            blockkick = attemptStat("PuntBlk",obj)+attemptStat("FgBlk",obj)+attemptStat("XpBlk",obj)
-            blockTD = 0
+            for teamData in output['teamgamelogs']['gamelogs']:
+                name = teamData['team']['Name'] + " D/ST"
+                team = teamData['team']['Abbreviation']
+                pos = 'D/ST'
+                obj = teamData['stats']
+                games = 1
+                defSack = attemptStat("Sacks",obj)
+                qbHit = attemptStat("",obj)
+                forceFumble = attemptStat("FumForced",obj)
+                fumbleRecov = attemptStat("FumOppRec",obj)
+                defInt = attemptStat("Interceptions",obj)
+                passDef = attemptStat("PassesDefended",obj)
+                defTD = attemptStat("FumTD",obj)+attemptStat("IntTD",obj)
+                fumbleTD = attemptStat("FumTD",obj)
+                intTD = attemptStat("IntTD",obj)
+                puntTD = attemptStat("PrTD",obj)
+                kickTD = attemptStat("KrTD",obj)
+                pointsAgainst = attemptStat("PointsAgainst",obj)
+                defPassYards = attemptStat("",obj)
+                defRunYards = attemptStat("",obj)
+                safety = attemptStat("Safeties",obj)
+                blockkick = attemptStat("PuntBlk",obj)+attemptStat("FgBlk",obj)+attemptStat("XpBlk",obj)
+                blockTD = 0
 
-            sql += ("( " +
-                    str(year) + "," +
-                    str(week) + "," +
-                    "'" + name.replace("'","_") + "'," +
-                    "'" + pos + "'," +
-                    "'" + team + "'," +
-                    str(games) + "," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    "null," +
-                    str(defSack) + "," +
-                    str(qbHit) + "," +
-                    str(forceFumble) + "," +
-                    str(fumbleRecov) + "," +
-                    str(defInt) + "," +
-                    str(passDef) + "," +
-                    str(defTD) + "," +
-                    str(fumbleTD) + "," +
-                    str(intTD) + "," +
-                    str(puntTD) + "," +
-                    str(kickTD) + "," +
-                    str(pointsAgainst) + "," +
-                    str(defPassYards) + "," +
-                    str(defRunYards) + "," +
-                    str(safety) + "," +
-                    str(blockkick) + "," +
-                    str(blockTD) + "," +
-                    "null,null,null,null,null,null,null,null,current_timestamp() " +
-                    "),")
-        except:
-            None
+                sql += ("( " +
+                        str(year) + "," +
+                        str(week) + "," +
+                        "'" + name.replace("'","_") + "'," +
+                        "'" + pos + "'," +
+                        "'" + team + "'," +
+                        str(games) + "," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        "null," +
+                        str(defSack) + "," +
+                        str(qbHit) + "," +
+                        str(forceFumble) + "," +
+                        str(fumbleRecov) + "," +
+                        str(defInt) + "," +
+                        str(passDef) + "," +
+                        str(defTD) + "," +
+                        str(fumbleTD) + "," +
+                        str(intTD) + "," +
+                        str(puntTD) + "," +
+                        str(kickTD) + "," +
+                        str(pointsAgainst) + "," +
+                        str(defPassYards) + "," +
+                        str(defRunYards) + "," +
+                        str(safety) + "," +
+                        str(blockkick) + "," +
+                        str(blockTD) + "," +
+                        "null,null,null,null,null,null,null,null,current_timestamp() " +
+                        "),")
+        except Exception as e:
+            print(str(e))
 
     return sql[:-1]
     

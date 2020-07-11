@@ -17,9 +17,6 @@ now = datetime.utcnow() - timedelta(hours=4)
 
 year = (now - timedelta(days=20)).year
 
-print(year)
-
-sys.exit()
 
 if now.date() <= date(year, 9, 14) and now.date() >= date(year,9,7):
     week = 1

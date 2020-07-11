@@ -4,6 +4,7 @@ from security import mysqlConn
 
 import pymysql
 
+
 sql_host = mysqlConn['host']
 sql_user = mysqlConn['user']
 sql_pw = mysqlConn['passwd']
@@ -19,4 +20,3 @@ def connection(tunnel):
     c = conn.cursor()
 
     return c, conn
-

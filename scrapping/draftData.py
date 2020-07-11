@@ -45,8 +45,10 @@ with DOConnect() as tunnel:
                 draftValues = (i, row.find_all('th')[0].get_text(), tds[0].get_text(),
                                tds[1].get_text(), tds[2].get_text().replace("'","_"),
                                tds[3].get_text(), nullValue(tds[4].get_text()))
-                c.execute("insert into scrapped_data.draft values (%s, %s, %s, '%s', '%s', '%s', %s, current_timestamp());" % draftValues)
-
+                try:
+                    c.execute("insert into scrapped_data.draft values (%s, %s, %s, '%s', '%s', '%s', %s, current_timestamp());" % draftValues)
+                except:
+                    print('error')
         conn.commit()
 
         print("Draft Year",str(i),"Finished")

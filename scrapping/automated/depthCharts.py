@@ -13,6 +13,9 @@ fullName = CaseInsensitiveDict(fullName)
 
 
 def pullDepthCharts(season, week, day, time, url = 'https://subscribers.footballguys.com/apps/depthchart.php'):
+    deleteSql = ''' delete from scrapped_data.depthCharts where
+                chartSeason = %d and chartWeek = %d and
+                chartDay = '%s' and chartTime = '%s' ''' % (season, week,day,time)
     sql = "insert into scrapped_data.depthCharts values "
     params = {'type': 'noidp', 'lite':'no','exclude_coaches':'yes'}
     #url = 'https://subscribers.footballguys.com/apps/depthchart.php'
@@ -102,6 +105,6 @@ def pullDepthCharts(season, week, day, time, url = 'https://subscribers.football
     sql = sql[:-1]
 
     
-    return sql
+    return [deleteSql,sql]
 
 

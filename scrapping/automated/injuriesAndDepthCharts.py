@@ -15,7 +15,7 @@ from injuries import pullInjuries
 now = datetime.utcnow() - timedelta(hours=4)
 
 
-year = 2019
+year = 2020
 
 if now.date() <= date(year, 9, 10) and now.date() >= date(year,9,3):
     week = 1
@@ -71,8 +71,8 @@ with DOConnect() as tunnel:
     c, conn = connection(tunnel)
     try:
         sql = pullInjuries(year,week,day,time)
-
-        c.execute(sql)
+        for statement in sql:
+            c.execute(statement)
 
         conn.commit()
     except Exception as e:
@@ -80,8 +80,8 @@ with DOConnect() as tunnel:
 
     try:
         sql = pullDepthCharts(year,week,day,time)
-
-        c.execute(sql)
+        for statement in sql:
+            c.execute(statement)
 
         conn.commit()
     except Exception as e:

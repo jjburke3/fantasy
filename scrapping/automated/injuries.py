@@ -12,6 +12,9 @@ fullName = CaseInsensitiveDict(fullName)
 
 
 def pullInjuries(season, week, day, time):
+    deleteSql = '''delete from scrapped_data.injuries
+            where injSeason = %d and injWeek = %d
+            and injDay = '%s' and injTime = '%s' ''' % (season, week, day, time)
     sql = 'insert into scrapped_data.injuries values '
 
     teamsUrl = "https://www.rotoworld.com/api/team/football?sort=locale&filter%5Bactive%5D=1&filter%5Bleague%5D=21&include=secondary_logo"
@@ -71,7 +74,8 @@ def pullInjuries(season, week, day, time):
     sql = sql[:-1]
 
 
-    return sql
+    return [deleteSql,sql]
+
 
 
 

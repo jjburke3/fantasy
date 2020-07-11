@@ -67,7 +67,8 @@ def pullInjuries(season, week, day, time):
                         "'" + status.replace("'","_") + "'," +
                         ('null' if attributes['startDate'] == None else "'" +str(attributes['startDate']) + "'") + "," +
                         ('null' if attributes['endDate'] == None else "'" +str(attributes['endDate']) + "'") + "," +
-                        "'" + str(attributes['outlook']) + "'),"
+                        "'" + str(attributes['outlook']) + "'," +
+                        "current_timestamp()),"
                         )
 
 

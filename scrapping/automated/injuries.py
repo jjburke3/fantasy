@@ -17,18 +17,17 @@ def pullInjuries(season, week, day, time):
             and injDay = '%s' and injTime = '%s' ''' % (season, week, day, time)
     sql = 'insert into scrapped_data.injuries values '
 
-    teamsUrl = "https://www.rotoworld.com/api/team/football?sort=locale&filter%5Bactive%5D=1&filter%5Bleague%5D=21&include=secondary_logo"
-
+    teamsUrl = "https://www.rotoworld.com/api/team/football?sort=locale&filter%5Bactive%5D=1&filter%5Bleague.meta.drupal_internal__id%5D=21&include=secondary_logo"
+    
 
     teamsR = requests.get(teamsUrl).json()['data']
     
-    url2 = 'https://www.rotoworld.com/api/injury?sort=-start_date&filter%5Bplayer.team%5D='
+    url2 = 'https://www.rotoworld.com/api/injury?sort=-start_date&filter%5Bplayer.team.meta.drupal_internal__id%5D='
     url3 = '&filter%5Bplayer.status.active%5D=1&filter%5Bactive%5D=1&include=injury_type,player,player.status,player.position'
     url = 'https://www.rotoworld.com/api/injury'
 
     for teamLink in teamsR:
-        r = requests.get(url2 + str(teamLink['attributes']['id']) + url3)
-
+        r = requests.get(url2 + str(teamLink['attributes']['team_id']) + url3)
         data = r.json()
         for injury in data['data']:
             if injury['relationships']['player']['data']['type'] == "player--football":
@@ -42,16 +41,14 @@ def pullInjuries(season, week, day, time):
                     }
                 playerData = requests.get(url + "/" + injId + "/player").json()['data']
                 playerName = playerData['attributes']['name']
-
                 injuryData = requests.get(url + "/" + injId + "/injury_type").json()['data']
                 injuryName = injuryData['attributes']['name']
 
-                positionUrl = playerData['relationships']['position']['links']['related']
-                teamUrl = playerData['relationships']['team']['links']['related']
+                positionUrl = playerData['relationships']['position']['links']['related']['href']
+                teamUrl = playerData['relationships']['team']['links']['related']['href']
                 team = requests.get(teamUrl).json()['data']['attributes']['abbreviation']
-                print(team)
                 position = requests.get(positionUrl).json()['data']['attributes']['abbreviation']
-                statusUrl = playerData['relationships']['status']['links']['related']
+                statusUrl = playerData['relationships']['status']['links']['related']['href']
                 status = requests.get(statusUrl).json()['data']['attributes']['name']
 
                 sql += ("(" +
@@ -76,7 +73,6 @@ def pullInjuries(season, week, day, time):
 
 
     return [deleteSql,sql]
-
 
 
 

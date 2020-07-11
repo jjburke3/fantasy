@@ -17,42 +17,44 @@ now = datetime.utcnow() - timedelta(hours=4)
 
 year = (now - timedelta(days=20)).year
 
-
-if now.date() <= date(year, 9, 14) and now.date() >= date(year,9,7):
+yearStart = date(year,9,7)
+if now.date() < yearStart:
+    week = 0
+elif now.date() <= yearStart + timedelta(days=(7*1)):
     week = 1
-elif now.date() <= date(year, 9, 21):
+elif now.date() <= yearStart + timedelta(days=(7*2)):
     week = 2
-elif now.date() <= date(year, 9, 28):
+elif now.date() <= yearStart + timedelta(days=(7*3)):
     week = 3
-elif now.date() <= date(year, 10, 5):
+elif now.date() <= yearStart + timedelta(days=(7*4)):
     week = 4
-elif now.date() <= date(year, 10, 12):
+elif now.date() <= yearStart + timedelta(days=(7*5)):
     week = 5
-elif now.date() <= date(year, 10, 19):
+elif now.date() <= yearStart + timedelta(days=(7*6)):
     week = 6
-elif now.date() <= date(year, 10, 26):
+elif now.date() <= yearStart + timedelta(days=(7*7)):
     week = 7
-elif now.date() <= date(year, 11, 2):
+elif now.date() <= yearStart + timedelta(days=(7*8)):
     week = 8
-elif now.date() <= date(year, 11, 9):
+elif now.date() <= yearStart + timedelta(days=(7*9)):
     week = 9
-elif now.date() <= date(year, 11, 16):
+elif now.date() <= yearStart + timedelta(days=(7*10)):
     week = 10
-elif now.date() <= date(year, 11, 23):
+elif now.date() <= yearStart + timedelta(days=(7*11)):
     week = 11
-elif now.date() <= date(year, 11, 30):
+elif now.date() <= yearStart + timedelta(days=(7*12)):
     week = 12
-elif now.date() <= date(year, 12, 7):
+elif now.date() <= yearStart + timedelta(days=(7*13)):
     week = 13
-elif now.date() <= date(year, 12, 14):
+elif now.date() <= yearStart + timedelta(days=(7*14)):
     week = 14
-elif now.date() <= date(year, 12, 21):
+elif now.date() <= yearStart + timedelta(days=(7*15)):
     week = 15
-elif now.date() <= date(year, 12, 28):
+elif now.date() <= yearStart + timedelta(days=(7*16)):
     week = 16
-elif now.date() <= date(year+1, 1,4):
+elif now.date() <= yearStart + timedelta(days=(7*17)):
     week = 17
-elif now.date() > date(year+1, 1,4):
+elif now.date() > yearStart + timedelta(days=(7*17)):
     sys.exit()
 else:
     week = 0

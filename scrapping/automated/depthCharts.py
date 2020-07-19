@@ -12,11 +12,12 @@ from references import fullName, pfrAbbrName, fullToMascot, abbrToMascot, teamLo
 fullName = CaseInsensitiveDict(fullName)
 
 
-def pullDepthCharts(season, week, day, time, url = 'https://subscribers.footballguys.com/apps/depthchart.php'):
+def pullDepthCharts(season, week, day, time, url = 'https://subscribers.footballguys.com/apps/depthchart.php', timestamp = 'NULL'):
     deleteSql = ''' delete from scrapped_data.depthCharts where
-                chartSeason = %d and chartWeek = %d and
+                chartSeason = %s and chartWeek = %s and
                 chartDay = '%s' and chartTime = '%s' ''' % (season, week,day,time)
     sql = "insert into scrapped_data.depthCharts values "
+    
     params = {'type': 'noidp', 'lite':'no','exclude_coaches':'yes'}
     #url = 'https://subscribers.footballguys.com/apps/depthchart.php'
     
@@ -27,7 +28,7 @@ def pullDepthCharts(season, week, day, time, url = 'https://subscribers.football
     tables = soup.find_all('td', {"class":"la","width" : "50%"})
 
     paren = re.compile(" \((.+)\)")
-
+    
     for column in tables:
         teamRows = column.find_all("tr")
         teamName = ''
@@ -82,8 +83,10 @@ def pullDepthCharts(season, week, day, time, url = 'https://subscribers.football
                             if re.match("PR",extra):
                                 pr = 1
                         sql += ("(" +
-                                str(season) + "," +
-                                str(week) + "," +
+                                "null" + "," +
+                                "null" + "," +
+                                "" + str(season) + "," +
+                                "" + str(week) + "," +
                                 "'" + str(day) + "'," +
                                 "'" + str(time) + "'," +
                                 "'" + teamName + "'," +
@@ -97,14 +100,14 @@ def pullDepthCharts(season, week, day, time, url = 'https://subscribers.football
                                 "'" + str(kr) + "'," +
                                 "'" + str(pr) + "'," +
                                 
-                                "current_timestamp()),")
+                                "" + str(timestamp) + "),")
                         posRank += 1
 
                         
-
+    
     sql = sql[:-1]
 
     
-    return [deleteSql,sql]
+    return [sql]
 
 

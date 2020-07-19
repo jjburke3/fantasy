@@ -14,6 +14,13 @@ from openpyxl import load_workbook
 
 import glob
 
+def removeNAN(column):
+    if column != column:
+        return 'NULL'
+    elif column == '??':
+        return 'NULL'
+    else:
+        return column
 
 
 def formatPlayerRow(row,year,file_name):
@@ -49,6 +56,8 @@ def formatPlayerRow(row,year,file_name):
         pos = "'" + row.POS + "'"
     else:
         pos = 'NULL'
+
+    
     
     if 'Height' in row:
         if isinstance(row.Height,str):
@@ -65,12 +74,16 @@ def formatPlayerRow(row,year,file_name):
     else:
         height = 'NULL'
 
+    height = removeNAN(height)
+
     if 'Weight' in row:
         weight = row.Weight
     elif 'WEIGHT' in row:
         weight = row.WEIGHT
     else:
         weight = 'NULL'
+
+    weight = removeNAN(weight)
 
     if 'OVR' in row:
         overall = row.OVR
@@ -87,6 +100,8 @@ def formatPlayerRow(row,year,file_name):
     else:
         overall = 'NULL'
 
+    overall = removeNAN(overall)
+
     if 'Speed' in row:
         speed = row.Speed
     elif 'SPEED' in row:
@@ -94,8 +109,7 @@ def formatPlayerRow(row,year,file_name):
     else:
         speed = 'NULL'
 
-    if speed != speed:
-        speed = 'NULL'
+    speed = removeNAN(speed)
 
     if 'Acceleration' in row:
         accel = row.Acceleration
@@ -104,8 +118,7 @@ def formatPlayerRow(row,year,file_name):
     else:
         accel = 'NULL'
 
-    if accel != accel:
-        accel = 'NULL'
+    accel = removeNAN(accel)
 
     if 'Strength' in row:
         strength = row.Strength
@@ -114,6 +127,8 @@ def formatPlayerRow(row,year,file_name):
     else:
         strength = 'NULL'
 
+    strength = removeNAN(strength)
+
     if 'Agility' in row:
         agility = row.Agility
     elif 'AGILITY' in row:
@@ -121,12 +136,16 @@ def formatPlayerRow(row,year,file_name):
     else:
         agility = 'NULL'
 
+    agility = removeNAN(agility)
+
     if 'Awareness' in row:
         aware = row.Awareness
     elif 'AWARENESS' in row:
         aware = row.AWARENESS
     else:
         aware = 'NULL'
+
+    aware = removeNAN(aware)
 
     if 'Throw Power' in row:
         throwPower = row['Throw Power']
@@ -138,6 +157,8 @@ def formatPlayerRow(row,year,file_name):
         throwPower = row['THROW POWER']
     else:
         throwPower = 'NULL'
+
+    throwPower = removeNAN(throwPower)
 
     if 'Throw Accuracy Short' in row:
         throwAcc = mean([row['Throw Accuracy Short'],
@@ -175,6 +196,8 @@ def formatPlayerRow(row,year,file_name):
     else:
         throwAcc = 'NULL'
 
+    throwAcc = removeNAN(throwAcc)
+
     if 'Kick Power' in row:
         kickPower = row['Kick Power']
     elif 'Kick_Power' in row:
@@ -186,6 +209,8 @@ def formatPlayerRow(row,year,file_name):
     else:
         kickPower = 'NULL'
 
+    kickPower = removeNAN(kickPower)
+
     if 'Kick Accuracy' in row:
         kickAcc = row['Kick Accuracy']
     elif 'Kick_Accuracy' in row:
@@ -196,6 +221,8 @@ def formatPlayerRow(row,year,file_name):
         kickAcc = row['KICK ACCURACY']
     else:
         kickAcc = 'NULL'
+
+    kickAcc = removeNAN(kickAcc)
 
     if 'Run Block' in row:
         runBlock = row['Run Block']
@@ -225,6 +252,8 @@ def formatPlayerRow(row,year,file_name):
     else:
         runBlock = 'NULL'
 
+    runBlock = removeNAN(runBlock)
+
     if 'Pass Block' in row:
         passBlock = row['Pass Block']
     elif 'Pass_Block' in row:
@@ -253,6 +282,8 @@ def formatPlayerRow(row,year,file_name):
     else:
         passBlock = 'NULL'
 
+    passBlock = removeNAN(passBlock)
+
     if 'Catching' in row:
         catch = row.Catching
     elif 'CATCHING' in row:
@@ -262,12 +293,16 @@ def formatPlayerRow(row,year,file_name):
     else:
         catch = 'NULL'
 
+    catch = removeNAN(catch)
+
     if 'Carrying' in row:
         carry = row.Carrying
     elif 'CARRYING' in row:
         carry = row.CARRYING
     else:
         carry = 'NULL'
+
+    carry = removeNAN(carry)
 
     if 'Ball Carrier Vision' in row:
         bc = row['Ball Carrier Vision']
@@ -284,12 +319,16 @@ def formatPlayerRow(row,year,file_name):
     else:
         bc = 'NULL'
 
+    bc = removeNAN(bc)
+
     if 'Injury' in row:
         injury = row.Injury
     elif 'INJURY' in row:
         injury = row.INJURY
     else:
         injury = 'NULL'
+
+    injury = removeNAN(injury)
 
     if 'Toughness' in row:
         tough = row.Toughness
@@ -298,12 +337,16 @@ def formatPlayerRow(row,year,file_name):
     else:
         tough = 'NULL'
 
+    tough = removeNAN(tough)
+
     if 'Stamina' in row:
         stamina = row.Stamina
     elif 'STAMINA' in row:
         stamina = row.STAMINA
     else:
         stamina = 'NULL'
+
+    stamina = removeNAN(stamina)
 
     if 'Route Running' in row:
         route = row['Route Running']
@@ -323,6 +366,8 @@ def formatPlayerRow(row,year,file_name):
                       row['Deep Route Running']])
     else:
         route = 'NULL'
+
+    route = removeNAN(route)
     
     
     returnText = ("(" + name + "," + #name
@@ -363,8 +408,7 @@ with DOConnect() as tunnel:
     c, conn = connection(tunnel)
     
 
-    for file_name in glob.glob(localDirectories['madden_files']+'*madden*.xls*'):
-
+    for file_name in glob.glob(localDirectories['madden_files']+"filesToRedo//"+'*madden*.xls*'):
 
         sqlScript = '''insert into madden_ratings.playerRatings
         (player_name, season, team, pos, height, weight, overall, speed,
@@ -373,11 +417,16 @@ with DOConnect() as tunnel:
         run_block, catch, carrying, bc_vision, injury,
         toughness, stamina, route_running)
         values '''
-        year = re.search('_\d+',file_name)
-        if year.group(0) == '_25':
-            year = 13
-        else:
-            year = int(year.group(0)[1:])-1
+        try:
+            print(file_name)
+            year = re.search('(?<=madden_nfl)_\d+',file_name)
+            if year.group(0) == '_25':
+                year = 13
+            else:
+                year = int(year.group(0)[1:])-1
+        except Exception as e:
+            print(str(e))
+            sys.exit()
         file=pd.read_excel(file_name)
         teamFile = file_name.split("\\")[-1]
         try:

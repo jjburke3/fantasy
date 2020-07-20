@@ -23,10 +23,6 @@ r2 = requests.get(startUrl).json()
 
 pages = [i[1] for i in r2[1:]]
 
-pages = ['20151003013142',
-         '20151105131831'
-    ]
-
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)
     for way in pages:

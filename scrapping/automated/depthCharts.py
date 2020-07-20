@@ -10,7 +10,8 @@ sys.path.insert(0,'..\..')
 from references import fullName, pfrAbbrName, fullToMascot, abbrToMascot, teamLocation
 
 fullName = CaseInsensitiveDict(fullName)
-
+def remove_non_ascii(text):
+    return re.sub(r'[^\x20-\x7E]',r'_',text)
 
 def pullDepthCharts(season, week, day, time, url = 'https://subscribers.footballguys.com/apps/depthchart.php', timestamp = 'NULL'):
     deleteSql = ''' delete from scrapped_data.depthCharts where
@@ -92,7 +93,7 @@ def pullDepthCharts(season, week, day, time, url = 'https://subscribers.football
                                 "'" + teamName + "'," +
                                 "'" + position + "'," +
                                 str(posRank) + "," +
-                                "'" + player.replace("'","_").replace("′","_") + "'," +
+                                "'" + remove_non_ascii(player).replace("'","_").replace("′","_") + "'," +
                                 "'" + role + "'," +
                                 "'" + injuryStatus + "'," +
                                 "'" + str(tdb) + "'," +

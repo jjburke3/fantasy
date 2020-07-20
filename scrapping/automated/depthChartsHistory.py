@@ -16,7 +16,7 @@ from injuries import pullInjuries
 day = ''
 time = ''
 
-startUrl = 'http://web.archive.org/cdx/search/cdx?url=https://subscribers.footballguys.com/apps/depthchart.php&collapse=digest&output=json'
+startUrl = 'http://web.archive.org/cdx/search/cdx?url=https://subscribers.footballguys.com/apps/depthchart.php&output=json'
 
 r2 = requests.get(startUrl).json()
 

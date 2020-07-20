@@ -13,7 +13,7 @@ fullName = CaseInsensitiveDict(fullName)
 def remove_non_ascii(text):
     return re.sub(r'[^\x20-\x7E]',r'_',text)
 
-def pullDepthCharts(season, week, day, time, url = 'https://subscribers.footballguys.com/apps/depthchart.php', timestamp = 'NULL'):
+def pullDepthCharts(season, week, day, time, versionNo = 'NULL', url = 'https://subscribers.footballguys.com/apps/depthchart.php', timestamp = 'NULL'):
     deleteSql = ''' delete from scrapped_data.depthCharts where
                 chartSeason = %s and chartWeek = %s and
                 chartDay = '%s' and chartTime = '%s' ''' % (season, week,day,time)
@@ -87,7 +87,7 @@ def pullDepthCharts(season, week, day, time, url = 'https://subscribers.football
                                 pr = 1
                         sql += ("(" +
                                 "null" + "," +
-                                "null" + "," +
+                                "" + str(versionNo) + "," +
                                 "" + str(season) + "," +
                                 "" + str(week) + "," +
                                 "'" + str(day) + "'," +

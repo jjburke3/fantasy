@@ -84,7 +84,10 @@ with DOConnect() as tunnel:
         print(str(e))
 
     try:
-        sql = pullDepthCharts(year,week,day,time)
+        c.execute('''select max(chartVersion) as version
+                     from scrapped_data.depthCharts''')
+        versionNo = c.fetchone()['version']
+        sql = pullDepthCharts(year,week,day,time,versionNo)
         for statement in sql:
             c.execute(statement)
 

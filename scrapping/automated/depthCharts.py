@@ -47,6 +47,8 @@ def pullDepthCharts(season, week, day, time, url = 'https://subscribers.football
                         posRank = 0
                     elif child.name == "font" or (position=="Coaches" and child.name=="a"):
                         player = child.text
+                        if len(player) > 65:
+                            player = player[:65]
                         injuryStatus = ''
                         tdb = 0
                         gl = 0

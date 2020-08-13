@@ -87,11 +87,16 @@ with DOConnect() as tunnel:
         c.execute('''select max(chartVersion) as version
                      from scrapped_data.depthCharts''')
         versionNo = (c.fetchone()[0]) + 1
-        print(versionNo)
         sql = pullDepthCharts(year,week,day,time,versionNo)
         for statement in sql:
             c.execute(statement)
 
+        conn.commit()
+    except Exception as e:
+        print(str(e))
+    try:
+        c.execute('''call la_liga_data.updatePlayerIds();''')
+        c.execute('''call la_liga_data.roserRatings();''')
         conn.commit()
     except Exception as e:
         print(str(e))

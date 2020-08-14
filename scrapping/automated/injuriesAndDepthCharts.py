@@ -96,7 +96,7 @@ with DOConnect() as tunnel:
         print(str(e))
     try:
         c.execute('''call la_liga_data.updatePlayerIds();''')
-        c.execute('''call la_liga_data.roserRatings();''')
+        c.execute('''call la_liga_data.rosterRatings();''')
         conn.commit()
     except Exception as e:
         print(str(e))

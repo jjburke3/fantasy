@@ -1,6 +1,7 @@
 
 import sys
 sys.path.insert(0,'../..')
+sys.path.insert(0,'../../model')
 from datetime import date, datetime, timedelta
 import calendar
 
@@ -11,6 +12,7 @@ from DOConn import connection
 from DOsshTunnel import DOConnect
 from depthCharts import pullDepthCharts
 from injuries import pullInjuries
+from nnClass import fantasyModel
 
 now = datetime.utcnow() - timedelta(hours=4)
 
@@ -98,6 +100,13 @@ with DOConnect() as tunnel:
         c.execute('''call la_liga_data.updatePlayerIds();''')
         c.execute('''call la_liga_data.rosterRatings();''')
         conn.commit()
+    except Exception as e:
+        print(str(e))
+    try:
+        c.execute('''call la_liga_data.buildModelDataSets()''')
+        conn.commit()
+        for pos in ['QB','RB','WR','TE','DST']:
+            fantasyModel(pos,year,week)
     except Exception as e:
         print(str(e))
 

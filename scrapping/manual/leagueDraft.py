@@ -5,11 +5,11 @@ from espnff import ESPNFF
 import sys
 sys.path.insert(0,'../..')
 sys.path.insert(0,'..')
-from security import fantasy_league
+from security import fantasy_league, espn_cookie, swid
 from references import fullName
 
 def pullDraftData(year):
-    client = ESPNFF(fantasy_league['username'], fantasy_league['password'])
+    client = ESPNFF(swid=swid, s2=espn_cookie)
     try:
         client.authorize()
     except AuthorizationError:
@@ -20,7 +20,6 @@ def pullDraftData(year):
     sql = """insert into la_liga_data.draftData values %s """
     sqlInsert = ''
     sqlInsert2 = ''
-
     draft = league.draftData()
     for pick in draft:
         sqlInsert += ("(" +

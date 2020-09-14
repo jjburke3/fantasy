@@ -21,7 +21,7 @@ from DOsshTunnel import DOConnect
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)
     weekRun = 13
-    year = 2019
+    year = 2020
          
     data = pd.read_sql("""select ifnull(avg(a.winPoints),0)
  as donePoints, 

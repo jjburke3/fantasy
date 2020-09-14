@@ -102,13 +102,13 @@ with DOConnect() as tunnel:
         conn.commit()
     except Exception as e:
         print(str(e))
-    try:
-        c.execute('''call la_liga_data.buildModelDataSets()''')
-        conn.commit()
-        for pos in ['QB','RB','WR','TE','DST']:
-            fantasyModel(pos,year,week)
-    except Exception as e:
-        print(str(e))
+##    try:
+##        c.execute('''call la_liga_data.buildModelDataSets()''')
+##        conn.commit()
+##        for pos in ['QB','RB','WR','TE','DST']:
+##            fantasyModel(pos,year,week)
+##    except Exception as e:
+##        print(str(e))
 
 
 

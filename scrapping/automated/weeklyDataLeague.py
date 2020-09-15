@@ -59,8 +59,6 @@ else:
     week = 0
 
 day = calendar.day_name[now.weekday()]
-    
-
 
 with DOConnect() as tunnel:
     c, conn = connection(tunnel)

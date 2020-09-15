@@ -16,7 +16,7 @@ def pullLeagueData(year,week):
         print('failed to authorize')
 
 
-    league = client.get_league(fantasy_league['league_id'], 2019)
+    league = client.get_league(fantasy_league['league_id'], year)
 
     sql = """insert into la_liga_data.pointsScored values %s
             on duplicate key update

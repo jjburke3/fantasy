@@ -34,6 +34,8 @@ foTeam = {
     'TB' : 'TB',
     'TEN' : 'TEN',
     'WAS' : 'WAS',
+    'LV' : 'LV',
+    'LVR' : 'LV',
     '' : 'none'
     }
 
@@ -72,6 +74,8 @@ ffTeam = {
     'TB' : 'TB',
     'TEN' : 'TEN',
     'WAS' : 'WAS',
+    'LV' : 'LV',
+    'LVR' : 'LV',
     '' : 'none'
     }
 
@@ -110,6 +114,8 @@ fullName = {
     'Tampa Bay Buccaneers' : 'TB',
     'Tennessee Titans' : 'TEN',
     'Washington Redskins' : 'WAS',
+    'Las Vegas Raiders' : 'LV',
+    'Washington Football Team' : 'WAS',
     '' : 'none'
     }
 
@@ -148,6 +154,8 @@ fullNameUCase = {
     'TAMPA BAY BUCCANEERS' : 'TB',
     'TENNESSEE TITANS' : 'TEN',
     'WASHINGTON REDSKINS' : 'WAS',
+    'LAS VEGAS RAIDERS' : 'LV',
+    'WASHINGTON FOOTBALL TEAM' : 'WAS',
     '' : 'none'
 
     }
@@ -190,6 +198,7 @@ teamLocation = {
     'Tampa Bay' : 'TB',
     'Tennessee' : 'TEN',
     'Washington' : 'WAS',
+    'Las Vegas' : 'LV',
     '' : 'none'
     }
 
@@ -228,6 +237,8 @@ pfrAbbrName = {
     'TAM' : 'TB',
     'TEN' : 'TEN',
     'WAS' : 'WAS',
+    'LV' : 'LV',
+    'LVR' : 'LV',
     '' : 'none'
     }
 
@@ -270,7 +281,9 @@ laligaName = {
     'Was' : 'WAS',
     'Wsh' : 'WAS',
     '' : 'none',
-    'LA' : 'LAR'
+    'LA' : 'LAR',
+    'LV' : 'LV',
+    'LVR' : 'LV',
     }
 
 fullToMascot = {
@@ -308,6 +321,7 @@ fullToMascot = {
     'Tampa Bay Buccaneers' : 'Buccaneers',
     'Tennessee Titans' : 'Titans',
     'Washington Redskins' : 'Redskins',
+    'Washington Football Team' : 'Washington',
     '' : 'none'
     }
 
@@ -345,7 +359,9 @@ abbrToMascot = {
     'STL' : 'Rams',
     'TB' : 'Buccaneers',
     'TEN' : 'Titans',
-    'WAS' : 'Redskins',
+    'WAS' : 'Washington',
+    'LV' : 'Raiders',
+    'LVR' : 'Raiders',
     '' : 'none'
     }
 

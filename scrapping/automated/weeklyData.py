@@ -19,7 +19,7 @@ now = datetime.utcnow() - timedelta(hours=4)
 
 year = (now - timedelta(days=20)).year
 
-yearStart = date(year,9,7)
+yearStart = date(year,9,9)
 if now.date() < yearStart:
     week = 0
 elif now.date() <= yearStart + timedelta(days=(7*1)):

@@ -31,13 +31,20 @@ def returnWeekStats(week,year=2019,week_range="from-5-days-ago-to-today"):
     teamUrl = "https://api.mysportsfeeds.com/v1.2/pull/nfl/%s/team_gamelogs.json"
 
     for i in range(48,80,4):
+        print(year,week,i)
         params['team'] = str(i)
         for j in range(1,4):
             params['team'] += "," + str(i+j)
-        r = requests.get(url % season,
-                     params=params,
-                     headers=headers)
-        print(year,week,i)
+        status = True
+        while status:
+            r = requests.get(url % season,
+                         params=params,
+                         headers=headers)
+            print('players',r)
+            if r.status_code != 200:
+                time.sleep(10)
+            else:
+                status = False
         try:
             output = r.json()
             for player in output['playergamelogs']['gamelogs']:
@@ -143,13 +150,17 @@ def returnWeekStats(week,year=2019,week_range="from-5-days-ago-to-today"):
             time.sleep(10)
         except Exception as e:
             None
-
+        status = True
+        while status:
             
-        r2 = requests.get(teamUrl % season,
-                     params=params,
-                     headers=headers)
-        time.sleep(5)
-        print(r2)
+            r2 = requests.get(teamUrl % season,
+                         params=params,
+                         headers=headers)
+            print('teams',r2)
+            if r2.status_code != 200:
+                time.sleep(10)
+            else:
+                status = False  
         try:
             output = r2.json()
             for teamData in output['teamgamelogs']['gamelogs']:
@@ -227,6 +238,7 @@ def returnWeekStats(week,year=2019,week_range="from-5-days-ago-to-today"):
                         str(blockTD) + "," +
                         "null,null,null,null,null,null,null,null,current_timestamp() " +
                         "),")
+            time.sleep(10)
         except Exception as e:
             print(str(e))
 
